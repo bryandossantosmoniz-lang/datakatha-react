@@ -1,0 +1,169 @@
+{
+  "header": {
+    "home": "Home",
+    "map": "Map",
+    "library": "Library",
+    "gallery": "Gallery",
+    "compare": "Compare",
+    "about": "About"
+  },
+  "home": {
+    "title": "Welcome to DATAKATHA",
+    "subtitle": "The interactive app dedicated to myths, legends and beliefs that shape cultures around the world.",
+    "dailyMyth": "✨ Daily Myth",
+    "discover": "Discover on map",
+    "shareTitle": "DATAKATHA - Myths and Legends",
+    "shareDescription": "Discover myths and legends from around the world"
+  },
+  "map": {
+    "title": "Interactive Map",
+    "filters": "Filters",
+    "culture": "Culture",
+    "theme": "Theme",
+    "creature": "Creature",
+    "search": "Search a myth...",
+    "searchPlaceholder": "Myth name, culture, creature...",
+    "allCultures": "All cultures",
+    "allThemes": "All themes",
+    "allCreatures": "All creatures",
+    "reset": "Reset",
+    "timeSlider": "Time Period",
+    "play": "Play",
+    "pause": "Pause",
+    "speed": "Speed",
+    "slow": "Slow",
+    "normal": "Normal",
+    "fast": "Fast",
+    "mythsFound": "{{count}} myth found",
+    "mythsFound_plural": "{{count}} myths found",
+    "listenDescription": "Listen to description",
+    "stop": "Stop",
+    "settings": "Settings"
+  },
+  "gallery": {
+    "title": "Myths Gallery",
+    "subtitle": "Explore our collection of {{count}} myths and legends",
+    "searchPlaceholder": "🔍 Search a myth...",
+    "allCultures": "All cultures",
+    "allThemes": "All themes",
+    "gridView": "🔲 Grid",
+    "listView": "📋 List",
+    "mythsFound": "{{count}} myth found",
+    "mythsFound_plural": "{{count}} myths found",
+    "noResults": "No myths found",
+    "tryFilters": "Try changing your filters",
+    "view": "View"
+  },
+  "library": {
+    "title": "Library",
+    "subtitle": "Browse cultures, themes, creatures and regions",
+    "cultures": "Cultures",
+    "themes": "Themes",
+    "creatures": "Creatures",
+    "creatureFamilies": "Creature Families",
+    "regions": "Regions",
+    "statistics": "Global Statistics",
+    "totalMyths": "Total Myths",
+    "totalCultures": "Cultures",
+    "totalThemes": "Themes",
+    "totalCreatures": "Creatures",
+    "mythCount": "{{count}} myth",
+    "mythCount_plural": "{{count}} myths"
+  },
+  "comparison": {
+    "title": "Myth Comparison",
+    "subtitle": "Select up to 4 myths to compare",
+    "clearAll": "🗑️ Clear all",
+    "myth": "Myth {{number}}",
+    "chooseMayth": "-- Choose a myth --",
+    "selectAtLeast2": "Select at least 2 myths",
+    "selectToCompare": "Choose myths from the dropdowns above to compare them",
+    "characteristic": "Characteristic",
+    "culture": "🌍 Culture",
+    "theme": "🎭 Theme",
+    "creature": "🐉 Creature",
+    "period": "⏱️ Period",
+    "estimatedDate": "📅 Estimated date",
+    "description": "📖 Description",
+    "noDescription": "No description available"
+  },
+  "about": {
+    "title": "DATAKATHA",
+    "subtitle": "The interactive encyclopedia of myths and legends",
+    "mission": "🎯 Our Mission",
+    "missionText": "DATAKATHA is an innovative platform dedicated to preserving and sharing the world's mythological heritage. Our goal is to create a bridge between cultures by making accessible the myths, legends and beliefs that have shaped humanity through the ages.",
+    "features": "✨ Features",
+    "technologies": "🛠️ Technologies",
+    "methodology": "📊 Methodology",
+    "methodologyText": "Our database is built from reliable academic sources, reference works and ethnographic research. Each myth is documented with:",
+    "methodologyItems": {
+      "origin": "Its geographical and cultural origin",
+      "period": "Its historical period of appearance",
+      "creatures": "Associated creatures and entities",
+      "themes": "Main mythological themes",
+      "sources": "Bibliographic sources and references"
+    },
+    "team": "👥 Our Team",
+    "sources": "📖 Sources and References",
+    "sourcesText": "The information presented on DATAKATHA comes from a rigorous compilation of scientific, literary and historical sources. We strive to maintain a high level of accuracy while making the content accessible to the general public.",
+    "contact": "📧 Contact",
+    "contactText": "Have a question, suggestion or wish to contribute to the project?",
+    "email": "Email",
+    "footer": "© 2025 DATAKATHA - All rights reserved",
+    "madeWith": "Made with ❤️ for the preservation of world mythological heritage",
+    "featuresList": {
+      "interactiveMap": {
+        "title": "Interactive Map",
+        "description": "Explore geolocated myths on a world map"
+      },
+      "timeline": {
+        "title": "Timeline",
+        "description": "Travel through eras and civilizations"
+      },
+      "audio": {
+        "title": "Audio",
+        "description": "Listen to myth descriptions with speech synthesis"
+      },
+      "filters": {
+        "title": "Advanced Filters",
+        "description": "Search by culture, theme, creature and more"
+      },
+      "library": {
+        "title": "Library",
+        "description": "Browse a complete database"
+      },
+      "comparison": {
+        "title": "Comparison",
+        "description": "Compare multiple myths side by side"
+      }
+    }
+  },
+  "teamSection": {
+    "title": "Our Team",
+    "clickToLearnMore": "👆 Click to learn more",
+    "keySkills": "Key skills:",
+    "viewLinkedIn": "View my LinkedIn profile",
+    "clickToReturn": "👆 Click to return"
+  },
+  "dailyMyth": {
+    "title": "✨ Daily Myth",
+    "discover": "Discover on map"
+  },
+  "common": {
+    "loading": "Loading...",
+    "error": "Error",
+    "save": "Save",
+    "cancel": "Cancel",
+    "close": "Close",
+    "readMore": "Read more",
+    "share": "Share",
+    "copy": "Copy",
+    "copied": "Copied!",
+    "search": "Search",
+    "filter": "Filter",
+    "reset": "Reset",
+    "next": "Next",
+    "previous": "Previous",
+    "viewDetails": "View details"
+  }
+}

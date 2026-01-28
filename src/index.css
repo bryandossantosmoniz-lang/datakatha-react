@@ -1,0 +1,25 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', sans-serif;
+  background: #F6F6F6;
+  color: #23232C;
+}
+
+#root {
+  min-height: 100vh;
+}
+
+/* Style pour que le volet latéral soit responsive sur mobile */
+@media (max-width: 768px) {
+  .myth-sidebar {
+    width: 100% !important;
+    height: 70vh !important;
+    top: auto !important;
+    bottom: 0 !important;
+  }
+}

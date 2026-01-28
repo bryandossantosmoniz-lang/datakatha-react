@@ -1,0 +1,169 @@
+{
+  "header": {
+    "home": "Accueil",
+    "map": "Carte",
+    "library": "Bibliothèque",
+    "gallery": "Galerie",
+    "compare": "Comparer",
+    "about": "À Propos"
+  },
+  "home": {
+    "title": "Bienvenue sur DATAKATHA",
+    "subtitle": "L'application interactive dédiée aux mythes, légendes et croyances qui façonnent les cultures à travers le monde.",
+    "dailyMyth": "✨ Mythe du jour",
+    "discover": "Découvrir sur la carte",
+    "shareTitle": "DATAKATHA - Mythes et Légendes",
+    "shareDescription": "Découvrez les mythes et légendes du monde entier"
+  },
+  "map": {
+    "title": "Carte Interactive",
+    "filters": "Filtres",
+    "culture": "Culture",
+    "theme": "Thème",
+    "creature": "Créature",
+    "search": "Rechercher un mythe...",
+    "searchPlaceholder": "Nom du mythe, culture, créature...",
+    "allCultures": "Toutes les cultures",
+    "allThemes": "Tous les thèmes",
+    "allCreatures": "Toutes les créatures",
+    "reset": "Réinitialiser",
+    "timeSlider": "Période temporelle",
+    "play": "Lecture",
+    "pause": "Pause",
+    "speed": "Vitesse",
+    "slow": "Lent",
+    "normal": "Normal",
+    "fast": "Rapide",
+    "mythsFound": "{{count}} mythe trouvé",
+    "mythsFound_plural": "{{count}} mythes trouvés",
+    "listenDescription": "Écouter la description",
+    "stop": "Arrêter",
+    "settings": "Réglages"
+  },
+  "gallery": {
+    "title": "Galerie des Mythes",
+    "subtitle": "Explorez notre collection de {{count}} mythes et légendes",
+    "searchPlaceholder": "🔍 Rechercher un mythe...",
+    "allCultures": "Toutes les cultures",
+    "allThemes": "Tous les thèmes",
+    "gridView": "🔲 Grille",
+    "listView": "📋 Liste",
+    "mythsFound": "{{count}} mythe trouvé",
+    "mythsFound_plural": "{{count}} mythes trouvés",
+    "noResults": "Aucun mythe trouvé",
+    "tryFilters": "Essayez de modifier vos filtres",
+    "view": "Voir"
+  },
+  "library": {
+    "title": "Bibliothèque",
+    "subtitle": "Parcourez cultures, thèmes, créatures et régions",
+    "cultures": "Cultures",
+    "themes": "Thèmes",
+    "creatures": "Créatures",
+    "creatureFamilies": "Familles de créatures",
+    "regions": "Régions",
+    "statistics": "Statistiques Globales",
+    "totalMyths": "Mythes totaux",
+    "totalCultures": "Cultures",
+    "totalThemes": "Thèmes",
+    "totalCreatures": "Créatures",
+    "mythCount": "{{count}} mythe",
+    "mythCount_plural": "{{count}} mythes"
+  },
+  "comparison": {
+    "title": "Comparaison de Mythes",
+    "subtitle": "Sélectionnez jusqu'à 4 mythes pour les comparer",
+    "clearAll": "🗑️ Tout effacer",
+    "myth": "Mythe {{number}}",
+    "chooseMayth": "-- Choisir un mythe --",
+    "selectAtLeast2": "Sélectionnez au moins 2 mythes",
+    "selectToCompare": "Choisissez des mythes dans les menus déroulants ci-dessus pour les comparer",
+    "characteristic": "Caractéristique",
+    "culture": "🌍 Culture",
+    "theme": "🎭 Thème",
+    "creature": "🐉 Créature",
+    "period": "⏱️ Période",
+    "estimatedDate": "📅 Date estimée",
+    "description": "📖 Description",
+    "noDescription": "Aucune description disponible"
+  },
+  "about": {
+    "title": "DATAKATHA",
+    "subtitle": "L'encyclopédie interactive des mythes et légendes",
+    "mission": "🎯 Notre Mission",
+    "missionText": "DATAKATHA est une plateforme innovante dédiée à la préservation et à la diffusion du patrimoine mythologique mondial. Notre objectif est de créer un pont entre les cultures en rendant accessibles les mythes, légendes et croyances qui ont façonné l'humanité à travers les âges.",
+    "features": "✨ Fonctionnalités",
+    "technologies": "🛠️ Technologies",
+    "methodology": "📊 Méthodologie",
+    "methodologyText": "Notre base de données est construite à partir de sources académiques fiables, d'ouvrages de référence et de recherches ethnographiques. Chaque mythe est documenté avec :",
+    "methodologyItems": {
+      "origin": "Son origine géographique et culturelle",
+      "period": "Sa période historique d'apparition",
+      "creatures": "Les créatures et entités associées",
+      "themes": "Les thèmes mythologiques principaux",
+      "sources": "Les sources et références bibliographiques"
+    },
+    "team": "👥 Notre Équipe",
+    "sources": "📖 Sources et Références",
+    "sourcesText": "Les informations présentées sur DATAKATHA proviennent d'une compilation rigoureuse de sources scientifiques, littéraires et historiques. Nous nous efforçons de maintenir un niveau élevé d'exactitude tout en rendant le contenu accessible au grand public.",
+    "contact": "📧 Contact",
+    "contactText": "Vous avez une question, une suggestion ou vous souhaitez contribuer au projet ?",
+    "email": "Email",
+    "footer": "© 2025 DATAKATHA - Tous droits réservés",
+    "madeWith": "Fait avec ❤️ pour la préservation du patrimoine mythologique mondial",
+    "featuresList": {
+      "interactiveMap": {
+        "title": "Carte Interactive",
+        "description": "Explorez les mythes géolocalisés sur une carte du monde"
+      },
+      "timeline": {
+        "title": "Timeline",
+        "description": "Voyagez à travers les époques et les civilisations"
+      },
+      "audio": {
+        "title": "Audio",
+        "description": "Écoutez les descriptions des mythes avec synthèse vocale"
+      },
+      "filters": {
+        "title": "Filtres Avancés",
+        "description": "Recherchez par culture, thème, créature et plus"
+      },
+      "library": {
+        "title": "Bibliothèque",
+        "description": "Consultez une base de données complète"
+      },
+      "comparison": {
+        "title": "Comparaison",
+        "description": "Comparez plusieurs mythes côte à côte"
+      }
+    }
+  },
+  "teamSection": {
+    "title": "Notre Équipe",
+    "clickToLearnMore": "👆 Cliquez pour en savoir plus",
+    "keySkills": "Compétences clés:",
+    "viewLinkedIn": "Voir mon profil LinkedIn",
+    "clickToReturn": "👆 Cliquez pour revenir"
+  },
+  "dailyMyth": {
+    "title": "✨ Mythe du jour",
+    "discover": "Découvrir sur la carte"
+  },
+  "common": {
+    "loading": "Chargement...",
+    "error": "Erreur",
+    "save": "Enregistrer",
+    "cancel": "Annuler",
+    "close": "Fermer",
+    "readMore": "En savoir plus",
+    "share": "Partager",
+    "copy": "Copier",
+    "copied": "Copié !",
+    "search": "Rechercher",
+    "filter": "Filtrer",
+    "reset": "Réinitialiser",
+    "next": "Suivant",
+    "previous": "Précédent",
+    "viewDetails": "Voir les détails"
+  }
+}
