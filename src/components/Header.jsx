@@ -245,6 +245,33 @@ function Header() {
           </Link>
 
           <Link
+            to="/sites"
+            onClick={closeMenu}
+            style={{
+              padding: isMobile ? '15px 20px' : '10px 20px',
+              borderRadius: isMobile ? '0' : '8px',
+              color: 'white',
+              textDecoration: 'none',
+              fontWeight: '600',
+              fontSize: '15px',
+              background: isActive('/sites') ? 'rgba(255,255,255,0.25)' : 'transparent',
+              transition: 'all 0.2s'
+            }}
+            onMouseEnter={(e) => {
+              if (!isActive('/sites')) {
+                e.currentTarget.style.background = 'rgba(255,255,255,0.15)'
+              }
+            }}
+            onMouseLeave={(e) => {
+              if (!isActive('/sites')) {
+                e.currentTarget.style.background = 'transparent'
+              }
+            }}
+          >
+            🏛️ Sites Touristiques
+          </Link>
+
+          <Link
             to="/a-propos"
             onClick={closeMenu}
             style={{

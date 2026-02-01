@@ -45,6 +45,13 @@ function Home() {
       color: '#27ae60'
     },
     {
+      title: 'Sites Touristiques',
+      icon: '🏛️',
+      description: 'Découvrez les lieux réels qui ont inspiré ou abritent des mythes',
+      path: '/sites',
+      color: '#d8198f'
+    },
+    {
       title: 'À Propos',
       icon: 'ℹ️',
       description: 'En savoir plus sur DATAKATHA',

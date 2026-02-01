@@ -6,7 +6,10 @@ import Bibliotheque from './pages/Bibliotheque'
 import GalleryPage from './pages/GalleryPage'
 import ComparisonPage from './pages/ComparisonPage'
 import AboutPage from './pages/AboutPage'
+import SitesTouristiques from './pages/SitesTouristiques'
 import './i18n/config'
+
+
 
 function App() {
   return (
@@ -19,6 +22,7 @@ function App() {
           <Route path="/bibliotheque" element={<Bibliotheque />} />
           <Route path="/galerie" element={<GalleryPage />} />
           <Route path="/comparaison" element={<ComparisonPage />} />
+          <Route path="/sites" element={<SitesTouristiques />} />
           <Route path="/a-propos" element={<AboutPage />} />
         </Routes>
       </div>
