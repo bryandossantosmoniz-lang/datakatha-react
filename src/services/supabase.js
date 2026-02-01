@@ -115,8 +115,21 @@ export function getCoords(geom) {
 export const getDiffusions = async () => {
   const { data, error } = await supabase
     .from('diffusion')
-    .select('*')
-  if (error) console.error('Erreur diffusion:', error)
+    .select(`
+      *,
+      mythes:id_mythe (
+        id_mythe,
+        nom_mythe,
+        culture:id_culture (
+          nom_culture
+        )
+      )
+    `)
+  
+  if (error) {
+    console.error('Erreur diffusion:', error)
+    return []
+  }
   return data || []
 }
 

@@ -116,6 +116,63 @@ function MapPage() {
 
   const validMythes = finalFilteredMythes.filter(m => getCoords(m.geom) !== null)
 
+// Fonction pour parser les géométries
+const parsePolygonCoords = (geom, name) => {
+  if (!geom) {
+    console.warn(`${name}: geom est null`)
+    return null
+  }
+  
+  try {
+    console.log(`${name} - Type geom:`, typeof geom)
+    
+    // Cas 1: GeoJSON standard
+    if (geom.type && geom.coordinates) {
+      console.log(`${name} - Format: GeoJSON (${geom.type})`)
+      
+      let coords = geom.coordinates
+      
+      // Si Polygon, prendre le premier ring
+      if (geom.type === 'Polygon') {
+        coords = coords[0]
+      }
+      
+      // Si MultiPolygon, prendre le premier polygon
+      if (geom.type === 'MultiPolygon') {
+        coords = coords[0][0]
+      }
+      
+      console.log(`${name} - ${coords?.length} points`)
+      
+      if (coords && coords.length > 0) {
+        // Inverser pour Leaflet: [lat, lng]
+        return coords.map(c => [c[1], c[0]])
+      }
+    }
+    
+    // Cas 2: WKT String
+    if (typeof geom === 'string' && geom.includes('POLYGON')) {
+      console.log(`${name} - Format: WKT`)
+      const match = geom.match(/\(\((.*?)\)\)/)
+      if (match) {
+        const coords = match[1].split(',').map(point => {
+          const [lng, lat] = point.trim().split(' ').map(Number)
+          return [lat, lng]
+        })
+        console.log(`${name} - ${coords.length} points`)
+        return coords
+      }
+    }
+    
+    console.warn(`${name} - Format non reconnu`)
+    return null
+    
+  } catch (error) {
+    console.error(`${name} - Erreur:`, error)
+    return null
+  }
+}
+
   return (
     <div style={{ display: 'flex', height: 'calc(100vh - 120px)', position: 'relative' }}>
       {/* Filtres géographiques */}
@@ -151,60 +208,151 @@ function MapPage() {
           
           {/* Couche Diffusion - DANS le MapContainer */}
           {activeLayers.diffusion && diffusions.map((diff, i) => {
-            const coords = diff.geom?.coordinates || []
-            if (coords.length === 0) return null
-            
-            return (
-              <Polyline
-                key={`diff-${i}`}
-                positions={coords.map(c => [c[1], c[0]])}
-                color="#3498db"
-                weight={2}
-                opacity={0.6}
-              >
-                <Popup>Diffusion du mythe</Popup>
-              </Polyline>
-            )
-          })}
+          const coords = parsePolygonCoords(diff.geom, `Diffusion ${i}`)
+          if (!coords || coords.length === 0) return null
+  
+          return (
+            <Polyline
+              key={`diff-${i}`}
+              positions={coords}
+              color="#3498db"
+              weight={3}
+              opacity={0.7}
+            >
+              <Popup>
+                <div style={{ minWidth: '200px' }}>
+                  <strong style={{ color: '#3498db', fontSize: '16px' }}>
+                    🌊 Diffusion du mythe
+                  </strong>
+                  
+                  {diff.mythe && (
+                    <>
+                      <div style={{ 
+                        marginTop: '10px', 
+                        padding: '8px', 
+                        background: '#f0f0f0', 
+                        borderRadius: '6px' 
+                      }}>
+                        <strong>📖 Mythe :</strong><br />
+                        {diff.mythe.nom_mythe}
+                      </div>
+                      
+                      {diff.mythe.culture && (
+                        <div style={{ 
+                          marginTop: '8px', 
+                          fontSize: '13px', 
+                          color: '#666' 
+                        }}>
+                          🌍 {diff.mythe.culture.nom_culture}
+                        </div>
+                      )}
+                    </>
+                  )}
+                  
+                  {diff.periode && (
+                    <div style={{ 
+                      marginTop: '8px', 
+                      fontSize: '12px', 
+                      color: '#888' 
+                    }}>
+                      📅 {diff.periode}
+                    </div>
+                  )}
+                  
+                  {diff.ordre && (
+                    <div style={{ 
+                      marginTop: '5px', 
+                      fontSize: '12px', 
+                      color: '#888' 
+                    }}>
+                      ↗️ Étape {diff.ordre}
+                    </div>
+                    )}
+                  </div>
+              </Popup>
+            </Polyline>
+          )
+        })}
+            // Remplace le rendu CULTURES par :
+            {activeLayers.cultures && culturePolygons.map((cult, i) => {
+              const coords = parsePolygonCoords(cult.geom, `Culture: ${cult.nom_culture}`)
+              
+              if (!coords || coords.length < 3) {
+                console.warn(`Culture ${cult.nom_culture}: Insuffisant (${coords?.length || 0} points)`)
+                return null
+              }
+              
+              // Vérifier validité
+              const validCoords = coords.filter(c => 
+                Array.isArray(c) && c.length === 2 && 
+                !isNaN(c[0]) && !isNaN(c[1]) &&
+                c[0] >= -90 && c[0] <= 90 && 
+                c[1] >= -180 && c[1] <= 180
+              )
+              
+              if (validCoords.length < 3) {
+                console.warn(`Culture ${cult.nom_culture}: Points invalides`)
+                return null
+              }
+              
+              console.log(`✅ Culture ${cult.nom_culture}: ${validCoords.length} points OK`)
+              
+              return (
+                <Polygon
+                  key={`cult-${i}`}
+                  positions={validCoords}
+                  color="#9b59b6"
+                  fillColor="#9b59b6"
+                  fillOpacity={0.2}
+                  weight={2}
+                >
+                  <Popup>
+                    <strong>{cult.nom_culture}</strong>
+                    <br />
+                    <small>{validCoords.length} points</small>
+                  </Popup>
+                </Polygon>
+              )
+            })}
 
-          {/* Couche Cultures - DANS le MapContainer */}
-          {activeLayers.cultures && culturePolygons.map((cult, i) => {
-            const coords = cult.geom?.coordinates?.[0] || []
-            if (coords.length === 0) return null
-            
-            return (
-              <Polygon
-                key={`cult-${i}`}
-                positions={coords.map(c => [c[1], c[0]])}
-                color="#9b59b6"
-                fillColor="#9b59b6"
-                fillOpacity={0.2}
-                weight={2}
-              >
-                <Popup>{cult.nom_culture}</Popup>
-              </Polygon>
-            )
-          })}
+            // Remplace le rendu RÉGIONS par :
+            {activeLayers.regions && regionPolygons.map((reg, i) => {
+              const coords = parsePolygonCoords(reg.geom, `Région: ${reg.nom_region}`)
+              
+              if (!coords || coords.length < 3) return null
+              
+              const validCoords = coords.filter(c => 
+                Array.isArray(c) && c.length === 2 && 
+                !isNaN(c[0]) && !isNaN(c[1]) &&
+                c[0] >= -90 && c[0] <= 90 && 
+                c[1] >= -180 && c[1] <= 180
+              )
+              
+              if (validCoords.length < 3) return null
+              
+              console.log(`✅ Région ${reg.nom_region}: ${validCoords.length} points OK`)
+              
+              return (
+                <Polygon
+                  key={`reg-${i}`}
+                  positions={validCoords}
+                  color="#27ae60"
+                  fillColor="#27ae60"
+                  fillOpacity={0.2}
+                  weight={2}
+                >
+                  <Popup>
+                    <strong>{reg.nom_region}</strong>
+                    <br />
+                    <small>{validCoords.length} points</small>
+                  </Popup>
+                </Polygon>
+              )
+            })}
 
-          {/* Couche Régions - DANS le MapContainer */}
-          {activeLayers.regions && regionPolygons.map((reg, i) => {
-            const coords = reg.geom?.coordinates?.[0] || []
-            if (coords.length === 0) return null
-            
-            return (
-              <Polygon
-                key={`reg-${i}`}
-                positions={coords.map(c => [c[1], c[0]])}
-                color="#27ae60"
-                fillColor="#27ae60"
-                fillOpacity={0.2}
-                weight={2}
-              >
-                <Popup>{reg.nom_region}</Popup>
-              </Polygon>
-            )
-          })}
-          
+
+
+
           {/* Markers mythes - DANS le MapContainer */}
           <MarkerClusterGroup>
             {validMythes.map((myth) => {

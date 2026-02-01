@@ -35,14 +35,7 @@ const BASEMAPS = [
     url: 'https://{s}.tile.opentopomap.org/{z}/{x}/{y}.png',
     attribution: '&copy; OpenTopoMap',
     preview: 'https://a.tile.opentopomap.org/8/132/87.png'
-  },
-  {
-    id: 'watercolor',
-    name: 'Aquarelle',
-    url: 'https://tiles.stadiamaps.com/tiles/stamen_watercolor/{z}/{x}/{y}.jpg',
-    attribution: '&copy; Stamen Design',
-    preview: 'https://tiles.stadiamaps.com/tiles/stamen_watercolor/8/132/87.jpg'
-  },
+   },
   {
     id: 'streets',
     name: 'Rues',
