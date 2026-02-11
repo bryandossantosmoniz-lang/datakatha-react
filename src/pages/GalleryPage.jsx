@@ -1,14 +1,30 @@
 import React, { useState, useEffect } from 'react'
-import { getMythes } from '../services/supabase'
-import { Link } from 'react-router-dom'
+import { getMythes, getMythImages } from '../services/supabase'
+import { useNavigate } from 'react-router-dom'
 
-function GalleryCard({ myth }) {
+function GalleryCard({ myth, onCardClick }) {
   const [isHovered, setIsHovered] = useState(false)
+  const [images, setImages] = useState([])
+  const [loadingImage, setLoadingImage] = useState(true)
+
+  useEffect(() => {
+    loadImages()
+  }, [myth.id_mythe])
+
+  const loadImages = async () => {
+    const imgs = await getMythImages(myth.id_mythe)
+    setImages(imgs || [])
+    setLoadingImage(false)
+  }
+
+  {/*Si le mythe a des images associées, on prend la première. Sinon, on utilise l'image de la créature si elle existe.*/}
+  const mainImage = images.length > 0 ? images[0].url : myth.creature?.image_creature_url
 
   return (
     <div
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
+      onClick={() => onCardClick(myth)}
       style={{
         background: 'white',
         borderRadius: '16px',
@@ -24,57 +40,65 @@ function GalleryCard({ myth }) {
         flexDirection: 'column'
       }}
     >
-      {/* Image de la créature */}
-      {myth.creature?.URL_image && (
-        <div style={{
-          height: '200px',
-          overflow: 'hidden',
-          background: '#f0f0f0',
-          position: 'relative'
-        }}>
-          <img
-            src={myth.creature.URL_image}
-            alt={myth.nom_mythe}
-            style={{
-              width: '100%',
-              height: '100%',
-              objectFit: 'cover',
-              transition: 'transform 0.3s ease',
-              transform: isHovered ? 'scale(1.1)' : 'scale(1)'
-            }}
-            onError={(e) => {
-              e.target.style.display = 'none'
-            }}
-          />
-          
-          {/* Badge thème */}
-          {myth.theme && (
-            <div style={{
-              position: 'absolute',
-              top: '10px',
-              right: '10px',
-              background: 'rgba(155, 89, 182, 0.9)',
-              color: 'white',
-              padding: '6px 12px',
-              borderRadius: '20px',
-              fontSize: '11px',
-              fontWeight: '600',
-              backdropFilter: 'blur(10px)'
-            }}>
-              {myth.theme.nom_theme}
-            </div>
-          )}
-        </div>
-      )}
+      <div style={{
+        height: '220px',
+        overflow: 'hidden',
+        background: mainImage 
+          ? `url(${mainImage}) center/cover` 
+          : 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        position: 'relative',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center'
+      }}>
+        {loadingImage && (
+          <div style={{ color: 'white', fontSize: '14px' }}>Chargement...</div>
+        )}
+        
+        {!loadingImage && !mainImage && (
+          <div style={{ color: 'white', fontSize: '60px' }}>📖</div>
+        )}
 
-      {/* Contenu */}
+        {myth.theme && (
+          <div style={{
+            position: 'absolute',
+            top: '10px',
+            right: '10px',
+            background: 'rgba(155, 89, 182, 0.9)',
+            color: 'white',
+            padding: '6px 12px',
+            borderRadius: '20px',
+            fontSize: '11px',
+            fontWeight: '600',
+            backdropFilter: 'blur(10px)'
+          }}>
+            {myth.theme.nom_theme}
+          </div>
+        )}
+
+        {images.length > 1 && (
+          <div style={{
+            position: 'absolute',
+            bottom: '10px',
+            right: '10px',
+            background: 'rgba(0,0,0,0.8)',
+            color: 'white',
+            padding: '4px 10px',
+            borderRadius: '12px',
+            fontSize: '11px',
+            fontWeight: '600'
+          }}>
+            🖼️ {images.length} photos
+          </div>
+        )}
+      </div>
+
       <div style={{
         padding: '20px',
         flex: 1,
         display: 'flex',
         flexDirection: 'column'
       }}>
-        {/* Titre */}
         <h3 style={{
           margin: '0 0 10px 0',
           fontSize: '18px',
@@ -85,7 +109,6 @@ function GalleryCard({ myth }) {
           {myth.nom_mythe}
         </h3>
 
-        {/* Culture */}
         {myth.culture && (
           <div style={{
             display: 'flex',
@@ -101,7 +124,6 @@ function GalleryCard({ myth }) {
           </div>
         )}
 
-        {/* Description */}
         {myth.description_mythe && (
           <p style={{
             fontSize: '14px',
@@ -119,7 +141,6 @@ function GalleryCard({ myth }) {
           </p>
         )}
 
-        {/* Footer */}
         <div style={{
           display: 'flex',
           justifyContent: 'space-between',
@@ -127,7 +148,6 @@ function GalleryCard({ myth }) {
           paddingTop: '12px',
           borderTop: '1px solid #f0f0f0'
         }}>
-          {/* Période */}
           {myth.periode_texte && (
             <div style={{
               fontSize: '11px',
@@ -137,28 +157,23 @@ function GalleryCard({ myth }) {
               gap: '4px'
             }}>
               <span>⏱️</span>
-              <span>{myth.periode_texte.substring(0, 30)}...</span>
+              <span>{myth.periode_texte.substring(0, 25)}...</span>
             </div>
           )}
 
-          {/* Bouton */}
-          <Link
-            to={`/carte?mythe=${myth.id_mythe}`}
-            style={{
-              background: isHovered ? '#F6AA1C' : 'transparent',
-              color: isHovered ? 'white' : '#F6AA1C',
-              border: `2px solid #F6AA1C`,
-              padding: '6px 14px',
-              borderRadius: '20px',
-              textDecoration: 'none',
-              fontSize: '12px',
-              fontWeight: '600',
-              transition: 'all 0.2s',
-              whiteSpace: 'nowrap'
-            }}
-          >
+          <div style={{
+            background: isHovered ? '#F6AA1C' : 'transparent',
+            color: isHovered ? 'white' : '#F6AA1C',
+            border: '2px solid #F6AA1C',
+            padding: '6px 14px',
+            borderRadius: '20px',
+            fontSize: '12px',
+            fontWeight: '600',
+            transition: 'all 0.2s',
+            whiteSpace: 'nowrap'
+          }}>
             Voir →
-          </Link>
+          </div>
         </div>
       </div>
     </div>
@@ -166,13 +181,14 @@ function GalleryCard({ myth }) {
 }
 
 function GalleryPage() {
+  const navigate = useNavigate()
   const [mythes, setMythes] = useState([])
   const [filteredMythes, setFilteredMythes] = useState([])
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCulture, setSelectedCulture] = useState('all')
   const [selectedTheme, setSelectedTheme] = useState('all')
-  const [viewMode, setViewMode] = useState('grid') // grid, list, masonry
+  const [viewMode, setViewMode] = useState('grid')
   const [cultures, setCultures] = useState([])
   const [themes, setThemes] = useState([])
 
@@ -189,7 +205,6 @@ function GalleryPage() {
     setMythes(data)
     setFilteredMythes(data)
 
-    // Extraire cultures et thèmes uniques
     const culturesUniques = [...new Map(
       data.map(m => m.culture).filter(Boolean).map(c => [c.id_culture, c])
     ).values()]
@@ -206,7 +221,6 @@ function GalleryPage() {
   const filterMythes = () => {
     let filtered = mythes
 
-    // Filtre recherche
     if (searchTerm) {
       filtered = filtered.filter(m =>
         m.nom_mythe?.toLowerCase().includes(searchTerm.toLowerCase()) ||
@@ -214,17 +228,20 @@ function GalleryPage() {
       )
     }
 
-    // Filtre culture
     if (selectedCulture !== 'all') {
       filtered = filtered.filter(m => m.id_culture === parseInt(selectedCulture))
     }
 
-    // Filtre thème
     if (selectedTheme !== 'all') {
       filtered = filtered.filter(m => m.id_theme === parseInt(selectedTheme))
     }
 
     setFilteredMythes(filtered)
+  }
+
+  const handleCardClick = (myth) => {
+    sessionStorage.setItem('selectedMyth', JSON.stringify(myth))
+    navigate('/carte')
   }
 
   if (loading) {
@@ -252,7 +269,6 @@ function GalleryPage() {
         maxWidth: '1400px',
         margin: '0 auto'
       }}>
-        {/* Header */}
         <div style={{
           textAlign: 'center',
           marginBottom: '40px'
@@ -278,7 +294,6 @@ function GalleryPage() {
           </p>
         </div>
 
-        {/* Barre de filtres */}
         <div style={{
           background: 'white',
           padding: '25px',
@@ -292,7 +307,6 @@ function GalleryPage() {
             gap: '15px',
             marginBottom: '15px'
           }}>
-            {/* Recherche */}
             <input
               type="text"
               placeholder="🔍 Rechercher un mythe..."
@@ -310,7 +324,6 @@ function GalleryPage() {
               onBlur={(e) => e.target.style.borderColor = '#e0e0e0'}
             />
 
-            {/* Culture */}
             <select
               value={selectedCulture}
               onChange={(e) => setSelectedCulture(e.target.value)}
@@ -331,7 +344,6 @@ function GalleryPage() {
               ))}
             </select>
 
-            {/* Thème */}
             <select
               value={selectedTheme}
               onChange={(e) => setSelectedTheme(e.target.value)}
@@ -353,7 +365,6 @@ function GalleryPage() {
             </select>
           </div>
 
-          {/* Stats et vue */}
           <div style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -369,7 +380,6 @@ function GalleryPage() {
               {filteredMythes.length} mythe{filteredMythes.length > 1 ? 's' : ''} trouvé{filteredMythes.length > 1 ? 's' : ''}
             </div>
 
-            {/* Modes de vue */}
             <div style={{
               display: 'flex',
               gap: '8px'
@@ -410,7 +420,6 @@ function GalleryPage() {
           </div>
         </div>
 
-        {/* Galerie */}
         {filteredMythes.length === 0 ? (
           <div style={{
             textAlign: 'center',
@@ -436,7 +445,11 @@ function GalleryPage() {
             gap: '25px'
           }}>
             {filteredMythes.map(myth => (
-              <GalleryCard key={myth.id_mythe} myth={myth} />
+              <GalleryCard 
+                key={myth.id_mythe} 
+                myth={myth} 
+                onCardClick={handleCardClick}
+              />
             ))}
           </div>
         )}

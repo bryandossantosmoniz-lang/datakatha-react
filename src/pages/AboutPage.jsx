@@ -271,11 +271,11 @@ function AboutPage() {
                 fontSize: '16px',
                 color: '#2c3e50'
               }}>
-                📧 Email : <a href="mailto:contact@datakatha.com" style={{
+                📧 Email : <a href="mailto:contact.datakatha@gmail.com" style={{
                   color: '#F6AA1C',
                   textDecoration: 'none',
                   fontWeight: '600'
-                }}>contact@datakatha.com</a>
+                }}>contact.datakatha@gmail.com</a>
               </p>
             </div>
           </section>

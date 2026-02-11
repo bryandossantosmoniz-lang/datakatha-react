@@ -138,42 +138,7 @@ function LayerControl({ onLayerChange, isMobile }) {
                 isMobile={isMobile}
               />
 
-              {/* Couche Cultures */}
-              <LayerItem
-                name="cultures"
-                label="Cultures"
-                icon="🌍"
-                color="#9b59b6"
-                enabled={layers.cultures}
-                description="Zones d'influence culturelle"
-                onToggle={handleToggleLayer}
-                isMobile={isMobile}
-              />
-
-              {/* Couche Régions */}
-              <LayerItem
-                name="regions"
-                label="Régions"
-                icon="📍"
-                color="#27ae60"
-                enabled={layers.regions}
-                description="Délimitations géographiques historiques"
-                onToggle={handleToggleLayer}
-                isMobile={isMobile}
-              />
-            </div>
-
-            {/* Info */}
-            <div style={{
-              marginTop: '15px',
-              padding: '10px',
-              background: '#f8f9fa',
-              borderRadius: '8px',
-              fontSize: isMobile ? '11px' : '12px',
-              color: '#7f8c8d',
-              lineHeight: '1.4'
-            }}>
-              💡 <strong>Astuce :</strong> Activez plusieurs couches pour comparer les données
+              
             </div>
           </div>
 

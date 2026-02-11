@@ -131,6 +131,28 @@ export const getDiffusions = async () => {
     return []
   }
   return data || []
+
+  const { data: mediaDiffusions } = await supabase
+    .from('media')
+    .select('*')
+    .not('id_diffusion', 'is', null)
+
+  const mytheMap = {}
+  mythes?.forEach(m => { mytheMap[m.id_mythe] = m })
+
+  const mediaDiffusionMap = {}
+  mediaDiffusions?.forEach(media => {
+    if (!mediaDiffusionMap[media.id_diffusion]) {
+      mediaDiffusionMap[media.id_diffusion] = []
+    }
+    mediaDiffusionMap[media.id_diffusion].push(media)
+  })
+
+  return (data || []).map(diff => ({
+    ...diff,
+    mythe: mytheMap[diff.id_mythe] || null,
+    images: mediaDiffusionMap[diff.id_diffusion] || []
+  }))
 }
 
 // Récupérer polygones cultures
@@ -148,5 +170,19 @@ export const getRegionPolygons = async () => {
     .from('region')
     .select('nom_region, geom')
   if (error) console.error('Erreur régions:', error)
+  return data || []
+}
+
+export const getMythImages = async (idMythe) => {
+  const { data, error } = await supabase
+    .from('media')
+    .select('*')
+    .eq('id_mythe', idMythe)
+  
+  if (error) {
+    console.error('Erreur images mythe:', error)
+    return []
+  }
+  
   return data || []
 }

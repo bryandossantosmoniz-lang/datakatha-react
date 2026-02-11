@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react'
 import { supabase } from '../services/supabase'
+import { useNavigate } from 'react-router-dom'
 
 function BibliothequeCard({ title, items, icon, color, onItemClick }) {
   const [isExpanded, setIsExpanded] = useState(false)
   const [showDefinition, setShowDefinition] = useState(false)
 
-  // Définitions
   const definitions = {
     'Cultures': "Ensemble de croyances, traditions, récits et pratiques propres à un peuple, qui ont façonné la création et l'interprétation des mythes.",
     'Thèmes': "Catégorie indiquant le contexte dans lequel un mythe a été créé, permettant de comprendre son origine et sa fonction.",
@@ -20,9 +20,9 @@ function BibliothequeCard({ title, items, icon, color, onItemClick }) {
       borderRadius: '16px',
       overflow: 'hidden',
       boxShadow: '0 4px 20px rgba(0,0,0,0.1)',
-      transition: 'all 0.3s ease'
+      transition: 'all 0.3s ease',
+      marginBottom: '20px'
     }}>
-      {/* Header */}
       <div
         style={{
           background: `linear-gradient(135deg, ${color}dd 0%, ${color} 100%)`,
@@ -59,7 +59,6 @@ function BibliothequeCard({ title, items, icon, color, onItemClick }) {
           </div>
 
           <div style={{ display: 'flex', gap: '10px', alignItems: 'center' }}>
-            {/* Bouton info */}
             {definitions[title] && (
               <button
                 onClick={() => setShowDefinition(!showDefinition)}
@@ -80,7 +79,6 @@ function BibliothequeCard({ title, items, icon, color, onItemClick }) {
               </button>
             )}
             
-            {/* Flèche expand */}
             <span 
               onClick={() => setIsExpanded(!isExpanded)}
               style={{
@@ -95,7 +93,6 @@ function BibliothequeCard({ title, items, icon, color, onItemClick }) {
           </div>
         </div>
 
-        {/* Définition */}
         {definitions[title] && showDefinition && (
           <div style={{
             background: 'rgba(255,255,255,0.15)',
@@ -111,63 +108,109 @@ function BibliothequeCard({ title, items, icon, color, onItemClick }) {
         )}
       </div>
 
-      {/* Liste */}
       {isExpanded && (
         <div style={{
-          maxHeight: '400px',
+          maxHeight: '500px',
           overflowY: 'auto',
           padding: '10px'
         }}>
-          {items.map((item, i) => (
-            <div
-              key={i}
-              onClick={() => onItemClick && onItemClick(item)}
-              style={{
-                padding: '15px',
-                borderBottom: i < items.length - 1 ? '1px solid #f0f0f0' : 'none',
-                cursor: onItemClick ? 'pointer' : 'default',
-                transition: 'all 0.2s',
-                borderRadius: '8px',
-                margin: '5px 0'
-              }}
-              onMouseEnter={(e) => {
-                e.currentTarget.style.background = '#f8f9fa'
-                e.currentTarget.style.transform = 'translateX(5px)'
-              }}
-              onMouseLeave={(e) => {
-                e.currentTarget.style.background = 'white'
-                e.currentTarget.style.transform = 'translateX(0)'
-              }}
-            >
-              <div style={{
-                fontSize: '16px',
-                fontWeight: '600',
-                color: '#2c3e50',
-                marginBottom: '5px'
-              }}>
-                {item.name}
+          <div style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
+            gap: '15px'
+          }}>
+            {items.map((item, i) => (
+              <div
+                key={i}
+                onClick={() => onItemClick && onItemClick(item)}
+                style={{
+                  background: 'white',
+                  borderRadius: '12px',
+                  overflow: 'hidden',
+                  cursor: onItemClick ? 'pointer' : 'default',
+                  transition: 'all 0.3s',
+                  border: '2px solid transparent',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.borderColor = color
+                  e.currentTarget.style.transform = 'translateY(-5px)'
+                  e.currentTarget.style.boxShadow = `0 8px 20px ${color}40`
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.borderColor = 'transparent'
+                  e.currentTarget.style.transform = 'translateY(0)'
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)'
+                }}
+              >
+                {item.image && (
+                  <div style={{
+                    height: '160px',
+                    background: `url(${item.image}) center/cover`,
+                    position: 'relative'
+                  }}>
+                    {item.count !== undefined && (
+                      <div style={{
+                        position: 'absolute',
+                        top: '10px',
+                        right: '10px',
+                        background: 'rgba(0,0,0,0.7)',
+                        color: 'white',
+                        padding: '4px 10px',
+                        borderRadius: '12px',
+                        fontSize: '11px',
+                        fontWeight: '600',
+                        backdropFilter: 'blur(10px)'
+                      }}>
+                        📊 {item.count}
+                      </div>
+                    )}
+                  </div>
+                )}
+
+                <div style={{ padding: '15px' }}>
+                  <div style={{
+                    fontSize: '16px',
+                    fontWeight: '600',
+                    color: '#2c3e50',
+                    marginBottom: '8px'
+                  }}>
+                    {item.name}
+                  </div>
+                  
+                  {item.description && (
+                    <div style={{
+                      fontSize: '13px',
+                      color: '#7f8c8d',
+                      lineHeight: '1.5',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      display: '-webkit-box',
+                      WebkitLineClamp: 2,
+                      WebkitBoxOrient: 'vertical'
+                    }}>
+                      {item.description}
+                    </div>
+                  )}
+
+                  <div style={{
+                    marginTop: '10px',
+                    fontSize: '12px',
+                    color: color,
+                    fontWeight: '600',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between'
+                  }}>
+                    {item.count !== undefined && (
+                      <span>📍 {item.count} mythe{item.count > 1 ? 's' : ''}</span>
+                    )}
+                    <span style={{ fontSize: '16px' }}>→</span>
+                  </div>
+                </div>
               </div>
-              {item.description && (
-                <div style={{
-                  fontSize: '13px',
-                  color: '#7f8c8d',
-                  lineHeight: '1.5'
-                }}>
-                  {item.description}
-                </div>
-              )}
-              {item.count !== undefined && (
-                <div style={{
-                  fontSize: '12px',
-                  color: color,
-                  fontWeight: '600',
-                  marginTop: '8px'
-                }}>
-                  📊 {item.count} mythe{item.count > 1 ? 's' : ''}
-                </div>
-              )}
-            </div>
-          ))}
+            ))}
+          </div>
         </div>
       )}
     </div>
@@ -175,13 +218,13 @@ function BibliothequeCard({ title, items, icon, color, onItemClick }) {
 }
 
 function Bibliotheque() {
+  const navigate = useNavigate()
   const [cultures, setCultures] = useState([])
   const [themes, setThemes] = useState([])
   const [creatures, setCreatures] = useState([])
   const [famillesCreature, setFamillesCreature] = useState([])
   const [regions, setRegions] = useState([])
   const [loading, setLoading] = useState(true)
-  const [selectedItem, setSelectedItem] = useState(null)
 
   useEffect(() => {
     loadAllData()
@@ -189,69 +232,69 @@ function Bibliotheque() {
 
   const loadAllData = async () => {
     try {
-      // Cultures
       const { data: culturesData } = await supabase
         .from('culture')
         .select('*')
       
-      // Themes
       const { data: themesData } = await supabase
         .from('theme')
         .select('*')
       
-      // Creatures
       const { data: creaturesData } = await supabase
         .from('creature')
         .select('*')
       
-      // Familles de créatures
       const { data: famillesData } = await supabase
         .from('famille_creature')
         .select('*')
       
-      // Régions
       const { data: regionsData } = await supabase
         .from('region')
         .select('*')
       
-      // Compter les mythes par catégorie
       const { data: mythes } = await supabase
         .from('mythes')
         .select('id_culture, id_theme, id_typologie')
 
-      // Formater les données
       setCultures(culturesData?.map(c => ({
         name: c.nom_culture,
         description: c.resume_culture,
         count: mythes?.filter(m => m.id_culture === c.id_culture).length || 0,
-        id: c.id_culture
+        id: c.id_culture,
+        type: 'culture'
       })) || [])
 
       setThemes(themesData?.map(t => ({
         name: t.nom_theme,
         description: t.resume_theme,
         count: mythes?.filter(m => m.id_theme === t.id_theme).length || 0,
-        id: t.id_theme
+        id: t.id_theme,
+        type: 'theme'
       })) || [])
 
       setCreatures(creaturesData?.map(cr => ({
         name: cr.nom_creature || cr.type_creature || cr.nom,
         description: cr.resume_creature,
+        image: cr.URL_image,
         count: mythes?.filter(m => m.id_typologie === cr.id_typologie).length || 0,
-        id: cr.id_typologie
+        id: cr.id_typologie,
+        type: 'creature'
       })) || [])
 
       setFamillesCreature(famillesData?.map(f => ({
         name: f.nom_famille_creature,
         description: f.resume_famille_creature,
+        image: f.URL_image,
         count: creaturesData?.filter(c => c.id_famille_creature === f.id_famille_creature).length || 0,
-        id: f.id_famille_creature
+        id: f.id_famille_creature,
+        type: 'famille'
       })) || [])
 
       setRegions(regionsData?.map(r => ({
         name: r.nom_region,
         description: r.resume_region,
-        id: r.id_region
+        id: r.id_region,
+        type: 'region'
       })) || [])
 
       setLoading(false)
@@ -259,6 +302,15 @@ function Bibliotheque() {
       console.error('Erreur chargement:', error)
       setLoading(false)
     }
+  }
+
+  const handleItemClick = (item) => {
+    sessionStorage.setItem('mapFilter', JSON.stringify({
+      type: item.type,
+      value: item.name,
+      id: item.id
+    }))
+    navigate('/carte')
   }
 
   if (loading) {
@@ -283,10 +335,9 @@ function Bibliotheque() {
       padding: '40px 20px'
     }}>
       <div style={{
-        maxWidth: '1200px',
+        maxWidth: '1400px',
         margin: '0 auto'
       }}>
-        {/* Header */}
         <div style={{
           textAlign: 'center',
           color: 'white',
@@ -310,7 +361,6 @@ function Bibliotheque() {
           </p>
         </div>
 
-        {/* Stats globales */}
         <div style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
@@ -361,23 +411,31 @@ function Bibliotheque() {
             textAlign: 'center',
             color: 'white'
           }}>
+            <div style={{ fontSize: '32px', marginBottom: '10px' }}>👥</div>
+            <div style={{ fontSize: '28px', fontWeight: 'bold' }}>{famillesCreature.length}</div>
+            <div style={{ fontSize: '14px', opacity: 0.9 }}>Familles</div>
+          </div>
+          <div style={{
+            background: 'rgba(255,255,255,0.2)',
+            backdropFilter: 'blur(10px)',
+            padding: '20px',
+            borderRadius: '12px',
+            textAlign: 'center',
+            color: 'white'
+          }}>
             <div style={{ fontSize: '32px', marginBottom: '10px' }}>📍</div>
             <div style={{ fontSize: '28px', fontWeight: 'bold' }}>{regions.length}</div>
             <div style={{ fontSize: '14px', opacity: 0.9 }}>Régions</div>
           </div>
         </div>
 
-        {/* Cartes */}
-        <div style={{
-          display: 'grid',
-          gap: '20px'
-        }}>
+        <div style={{ display: 'grid', gap: '20px' }}>
           <BibliothequeCard
             title="Cultures"
             items={cultures}
             icon="🌍"
             color="#3498db"
-            onItemClick={(item) => setSelectedItem(item)}
+            onItemClick={handleItemClick}
           />
           
           <BibliothequeCard
@@ -385,7 +443,7 @@ function Bibliotheque() {
             items={themes}
             icon="🎭"
             color="#9b59b6"
-            onItemClick={(item) => setSelectedItem(item)}
+            onItemClick={handleItemClick}
           />
           
           <BibliothequeCard
@@ -393,7 +451,7 @@ function Bibliotheque() {
             items={creatures}
             icon="🐉"
             color="#e74c3c"
-            onItemClick={(item) => setSelectedItem(item)}
+            onItemClick={handleItemClick}
           />
           
           <BibliothequeCard
@@ -401,7 +459,7 @@ function Bibliotheque() {
             items={famillesCreature}
             icon="👥"
             color="#f39c12"
-            onItemClick={(item) => setSelectedItem(item)}
+            onItemClick={handleItemClick}
           />
           
           <BibliothequeCard
@@ -409,7 +467,7 @@ function Bibliotheque() {
             items={regions}
             icon="📍"
             color="#27ae60"
-            onItemClick={(item) => setSelectedItem(item)}
+            onItemClick={handleItemClick}
           />
         </div>
       </div>

@@ -7,7 +7,7 @@ function TeamSection() {
       role: 'Data-Engineer & Full stack-Developpeur',
       image: 'https://media.licdn.com/dms/image/v2/D4E03AQEv20v6D25yhQ/profile-displayphoto-crop_800_800/B4EZejsEqxG4AM-/0/1750797929832?e=1770854400&v=beta&t=GZHD9xoyZxKZ6f5CN8PwMvpWRecbuNVdcceQDxn0fGY',
       description: 'Passionné par la création, la structuration de données, la conception de data-pipelines et le développement de sites web en React',
-      skills: ['QGIS', 'Database', 'REACT'],
+      skills: ['VS code', 'Database', 'REACT'],
       color: '#667eea', 
       linkedin: 'https://www.linkedin.com/in/bryan-dos-santos-moniz/'
     },
@@ -15,7 +15,7 @@ function TeamSection() {
       name: 'Adama',
       role: 'Scrum Master Designer',
       image: 'https://media.licdn.com/dms/image/v2/D4E03AQE6rgxiRE-FJQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1708025656741?e=1770854400&v=beta&t=YlNt5t0uBtJnyJdOZQej_SxTu0lu4_ApPQ3xFRSS1ss',
-      description: 'Coordination de l’équipe en tant que Scrum Master, supervision du respect de la méthode agile, conception du design de l’application pour une interface claire et intuitive, et contribution à l’enrichissement de la base de données',
+      description: 'Coordination de l’équipe en tant que Scrum Master, supervision du respect de la méthode agile, conception du design de l’application et contribution à l’enrichissement de la base de données',
       skills: ['Visual Studio Code', 'Python', 'QGIS', 'Jira'],
       color: '#e74c3c',
       linkedin: 'https://www.linkedin.com/in/adama-dior-sow-0a5099224/'

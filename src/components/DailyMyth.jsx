@@ -1,13 +1,30 @@
 import React, { useState, useEffect } from 'react'
+import { getMythImages } from '../services/supabase'
 import { supabase } from '../services/supabase'
 
-function DailyMyth() {
+function DailyMyth({ myth }) {
   const [todayMyth, setTodayMyth] = useState(null)
   const [loading, setLoading] = useState(true)
-
+  const [images, setImages] = useState([])
+  const [loadingImages, setLoadingImages] = useState(true)
+  
   useEffect(() => {
     loadDailyMyth()
   }, [])
+
+  useEffect(() => {
+    if (todayMyth) {
+      loadImages()
+    }
+  }, [todayMyth])
+
+  const loadImages = async () => {
+    if (!todayMyth) return
+    setLoadingImages(true)
+    const imgs = await getMythImages(todayMyth.id_mythe)
+    setImages(imgs || [])
+    setLoadingImages(false)
+  }
 
   const loadDailyMyth = async () => {
     try {
@@ -55,6 +72,9 @@ function DailyMyth() {
     return null
   }
 
+  // Image principale : soit depuis media, soit depuis créature
+  const mainImage = images.length > 0 ? images[0].url : null
+
   return (
     <div style={{
       background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
@@ -66,6 +86,7 @@ function DailyMyth() {
       overflow: 'hidden',
       marginBottom: '40px'
     }}>
+
       {/* Badge "Mythe du jour" */}
       <div style={{
         position: 'absolute',
@@ -101,6 +122,35 @@ function DailyMyth() {
       }}>
         {todayMyth.nom_mythe}
       </h2>
+
+      {/* IMAGE EN HAUT */}
+      {loadingImages ? (
+        <div style={{
+          height: '250px',
+          background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          color: 'white',
+          marginBottom: '20px',
+          borderRadius: '10px'
+        }}>
+          Chargement de l'image...
+        </div>
+      ) : mainImage ? (
+        <div style={{ position: 'relative', marginBottom: '20px' }}>
+          <img 
+            src={mainImage} 
+            alt={todayMyth.nom_mythe} 
+            style={{ 
+              width: '100%', 
+              height: '500px',
+              objectFit: 'cover',
+              borderRadius: '10px'
+            }} 
+          />
+        </div>
+      ) : null}
 
       {/* Métadonnées */}
       <div style={{

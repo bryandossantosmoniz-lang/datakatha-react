@@ -1,3 +1,5 @@
+// MODIFICATION DANS FilterPanel.jsx
+
 import React, { useState, useEffect } from 'react'
 
 function FilterPanel({ 
@@ -5,7 +7,8 @@ function FilterPanel({
   onFilterChange,
   cultures = [],
   themes = [],
-  creatures = []
+  creatures = [],
+  externalFilter = null  // <-- AJOUTER CE PROP
 }) {
   const [filters, setFilters] = useState({
     culture: 'all',
@@ -15,6 +18,26 @@ function FilterPanel({
   })
 
   const [isOpen, setIsOpen] = useState(true)
+
+  // NOUVEAU: Synchroniser avec le filtre externe
+  useEffect(() => {
+    if (externalFilter) {
+      console.log('🔄 Synchronisation filtre externe:', externalFilter)
+      
+      if (externalFilter.type === 'culture') {
+        setFilters(prev => ({ ...prev, culture: String(externalFilter.id) }))
+      }
+      else if (externalFilter.type === 'theme') {
+        setFilters(prev => ({ ...prev, theme: String(externalFilter.id) }))
+      }
+      else if (externalFilter.type === 'creature' || externalFilter.type === 'famille') {
+        setFilters(prev => ({ ...prev, creature: String(externalFilter.id) }))
+      }
+      
+      // Ouvrir le panel pour montrer le filtre actif
+      setIsOpen(true)
+    }
+  }, [externalFilter])
 
   // Appliquer les filtres
   useEffect(() => {
@@ -137,6 +160,25 @@ function FilterPanel({
           🔍 Filtres
         </h3>
 
+        {/* Message si filtre externe actif */}
+        {externalFilter && (
+          <div style={{
+            background: 'rgba(246, 170, 28, 0.2)',
+            border: '1px solid #F6AA1C',
+            borderRadius: '8px',
+            padding: '12px',
+            marginBottom: '20px',
+            fontSize: '13px'
+          }}>
+            <div style={{ fontWeight: '600', marginBottom: '5px' }}>
+              📌 Filtre actif depuis la bibliothèque
+            </div>
+            <div style={{ opacity: 0.9 }}>
+              {externalFilter.type} : {externalFilter.value}
+            </div>
+          </div>
+        )}
+
         {/* Recherche */}
         <div style={{ marginBottom: '20px' }}>
           <label style={{
@@ -166,8 +208,6 @@ function FilterPanel({
               outline: 'none',
               transition: 'all 0.2s'
             }}
-            onFocus={(e) => e.target.style.background = 'rgba(255,255,255,0.15)'}
-            onBlur={(e) => e.target.style.background = 'rgba(255,255,255,0.1)'}
           />
         </div>
 
@@ -191,7 +231,7 @@ function FilterPanel({
               width: '100%',
               padding: '10px 12px',
               borderRadius: '6px',
-              border: '1px solid rgba(255,255,255,0.2)',
+              border: filters.culture !== 'all' ? '2px solid #F6AA1C' : '1px solid rgba(255,255,255,0.2)',
               background: 'rgba(255,255,255,0.1)',
               color: 'white',
               fontSize: '14px',
@@ -228,7 +268,7 @@ function FilterPanel({
               width: '100%',
               padding: '10px 12px',
               borderRadius: '6px',
-              border: '1px solid rgba(255,255,255,0.2)',
+              border: filters.theme !== 'all' ? '2px solid #F6AA1C' : '1px solid rgba(255,255,255,0.2)',
               background: 'rgba(255,255,255,0.1)',
               color: 'white',
               fontSize: '14px',
@@ -265,7 +305,7 @@ function FilterPanel({
               width: '100%',
               padding: '10px 12px',
               borderRadius: '6px',
-              border: '1px solid rgba(255,255,255,0.2)',
+              border: filters.creature !== 'all' ? '2px solid #F6AA1C' : '1px solid rgba(255,255,255,0.2)',
               background: 'rgba(255,255,255,0.1)',
               color: 'white',
               fontSize: '14px',
@@ -299,8 +339,6 @@ function FilterPanel({
               marginTop: '10px',
               transition: 'all 0.2s'
             }}
-            onMouseOver={(e) => e.target.style.background = 'rgba(231, 76, 60, 1)'}
-            onMouseOut={(e) => e.target.style.background = 'rgba(231, 76, 60, 0.8)'}
           >
             🔄 Réinitialiser les filtres
           </button>
