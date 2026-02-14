@@ -1,6 +1,6 @@
-import { useState, useEffect, useCallback, useRef } from 'react'
+import { useState, useEffect, useCallback, useRef, useMemo} from 'react'
 import { MapContainer, TileLayer, Marker, Popup, Polygon, Polyline } from 'react-leaflet'
-import { getMythes, getCoords, getDiffusions, getCulturePolygons, getRegionPolygons } from '../services/supabase'
+import { getMythes, getCoords, getDiffusions, getCulturePolygons, getRegionPolygons, supabase } from '../services/supabase'
 import MythSidebar from '../components/MythSidebar'
 import FilterPanel from '../components/FilterPanel'
 import MarkerClusterGroup from '../components/MarkerClusterGroup'
@@ -11,6 +11,21 @@ import 'leaflet/dist/leaflet.css'
 import 'leaflet.markercluster/dist/MarkerCluster.css'
 import 'leaflet.markercluster/dist/MarkerCluster.Default.css'
 import L from 'leaflet'
+import { useMap } from 'react-leaflet'
+
+function MapRefSetter({ mapRef }) {
+  const map = useMap()
+  
+  useEffect(() => {
+    if (map && mapRef) {
+      console.log('✅ Carte assignée à mapRef')
+      mapRef.current = map
+    }
+  }, [map, mapRef])
+  
+  return null
+}
+
 
 // Fixer l'icône Leaflet
 delete L.Icon.Default.prototype._getIconUrl
@@ -21,29 +36,102 @@ L.Icon.Default.mergeOptions({
 })
 
 // ==================== PALETTE DE COULEURS POUR LES CULTURES ====================
+// Couleurs pour les cultures
 const CULTURE_COLORS = {
-  'Grecque': { color: '#e74c3c', fillColor: '#e74c3c' },
-  'Romaine': { color: '#9b59b6', fillColor: '#9b59b6' },
-  'Égyptienne': { color: '#f39c12', fillColor: '#f39c12' },
-  'Nordique': { color: '#3498db', fillColor: '#3498db' },
-  'Celtique': { color: '#27ae60', fillColor: '#27ae60' },
   'Japonaise': { color: '#e91e63', fillColor: '#e91e63' },
-  'Chinoise': { color: '#ff5722', fillColor: '#ff5722' },
-  'Indienne': { color: '#9c27b0', fillColor: '#9c27b0' },
   'Aztèque': { color: '#ff9800', fillColor: '#ff9800' },
+  'Coréenne': { color: '#ff5722', fillColor: '#ff5722' },
+  'Occitane': { color: '#8e44ad', fillColor: '#8e44ad' },
+  'Anglo-normande': { color: '#2ecc71', fillColor: '#2ecc71' },
+  'Mongole': { color: '#c0392b', fillColor: '#c0392b' },
+  'Islandaise': { color: '#3498db', fillColor: '#3498db' },
+  'Ecossaise': { color: '#16a085', fillColor: '#16a085' },
+  'Slave': { color: '#d35400', fillColor: '#d35400' },
+  'Française': { color: '#2980b9', fillColor: '#2980b9' },
+  'Européenne du Nord-Ouest': { color: '#27ae60', fillColor: '#27ae60' },
+  'Alpine': { color: '#95a5a6', fillColor: '#95a5a6' },
+  'Scandinave': { color: '#34495e', fillColor: '#34495e' },
+  'Ashanti': { color: '#f39c12', fillColor: '#f39c12' },
+  'Maorie': { color: '#1abc9c', fillColor: '#1abc9c' },
+  'Yorouba': { color: '#e74c3c', fillColor: '#e74c3c' },
+  'Egypte antique': { color: '#f1c40f', fillColor: '#f1c40f' },
+  'Marocaine': { color: '#d35400', fillColor: '#d35400' },
+  'Étatsunienne': { color: '#c0392b', fillColor: '#c0392b' },
+  'Javanaise-Malaise': { color: '#16a085', fillColor: '#16a085' },
+  'Fidjienne': { color: '#2980b9', fillColor: '#2980b9' },
+  'Provençale': { color: '#8e44ad', fillColor: '#8e44ad' },
+  'Gréco-romaine': { color: '#9b59b6', fillColor: '#9b59b6' },
+  'Roumaine': { color: '#e67e22', fillColor: '#e67e22' },
+  'Irlandaise': { color: '#27ae60', fillColor: '#27ae60' },
+  'Hébraïque': { color: '#3498db', fillColor: '#3498db' },
+  'Franco-anglaise': { color: '#34495e', fillColor: '#34495e' },
+  'Kanuri': { color: '#f39c12', fillColor: '#f39c12' },
+  'Mandingue': { color: '#d35400', fillColor: '#d35400' },
+  'San': { color: '#95a5a6', fillColor: '#95a5a6' },
+  'Fon': { color: '#e74c3c', fillColor: '#e74c3c' },
+  'Grecque': { color: '#3498db', fillColor: '#3498db' },
+  'Caucasienne': { color: '#7f8c8d', fillColor: '#7f8c8d' },
+  'Aïnoue': { color: '#16a085', fillColor: '#16a085' },
+  'Akan': { color: '#f1c40f', fillColor: '#f1c40f' },
+  'Nubienne': { color: '#c0392b', fillColor: '#c0392b' },
+  'Baganda': { color: '#27ae60', fillColor: '#27ae60' },
+  'Dinka': { color: '#8e44ad', fillColor: '#8e44ad' },
   'Maya': { color: '#4caf50', fillColor: '#4caf50' },
-  'Inca': { color: '#00bcd4', fillColor: '#00bcd4' },
-  'Africaine': { color: '#795548', fillColor: '#795548' },
-  'Polynésienne': { color: '#009688', fillColor: '#009688' },
-  'Mésopotamienne': { color: '#607d8b', fillColor: '#607d8b' },
-  'Perse': { color: '#673ab7', fillColor: '#673ab7' }
+  'Franco-belge': { color: '#2c3e50', fillColor: '#2c3e50' },
+  'Polonaise': { color: '#e74c3c', fillColor: '#e74c3c' },
+  'Canadienne': { color: '#c0392b', fillColor: '#c0392b' },
+  'Thailandaise': { color: '#9b59b6', fillColor: '#9b59b6' },
+  'Amazigh': { color: '#f39c12', fillColor: '#f39c12' },
+  'Malaise/Khmer': { color: '#1abc9c', fillColor: '#1abc9c' },
+  'Hindoue': { color: '#ff9800', fillColor: '#ff9800' },
+  'Chinoise': { color: '#e91e63', fillColor: '#e91e63' },
+  'Tibétano-himalayenne': { color: '#673ab7', fillColor: '#673ab7' },
+  'Pakistanaise': { color: '#009688', fillColor: '#009688' },
+  'Portugaise': { color: '#4caf50', fillColor: '#4caf50' },
+  'Swahilie': { color: '#795548', fillColor: '#795548' }
+}
+
+// Couleurs pour les régions
+const REGION_COLORS = {
+  'Europe Baltique': { color: '#3498db', fillColor: '#3498db' },
+  'Asie du Sud': { color: '#ff9800', fillColor: '#ff9800' },
+  'Afrique de l\'Ouest': { color: '#f39c12', fillColor: '#f39c12' },
+  'Centre-afrique': { color: '#27ae60', fillColor: '#27ae60' },
+  'Afrique de l\'Est': { color: '#e74c3c', fillColor: '#e74c3c' },
+  'Afrique du Sud': { color: '#9b59b6', fillColor: '#9b59b6' },
+  'Europe du Sud': { color: '#1abc9c', fillColor: '#1abc9c' },
+  'Europe du Nord': { color: '#34495e', fillColor: '#34495e' },
+  'Europe de l\'Est': { color: '#c0392b', fillColor: '#c0392b' },
+  'Australie': { color: '#16a085', fillColor: '#16a085' },
+  'Europe de l\'Ouest': { color: '#2980b9', fillColor: '#2980b9' },
+  'Amérique centrale': { color: '#d35400', fillColor: '#d35400' },
+  'Europe Centrale': { color: '#7f8c8d', fillColor: '#7f8c8d' },
+  'Asie de l\'Est': { color: '#e91e63', fillColor: '#e91e63' },
+  'Asie du nord': { color: '#95a5a6', fillColor: '#95a5a6' },
+  'Moyen-Orient': { color: '#f1c40f', fillColor: '#f1c40f' },
+  'Mélanésie': { color: '#2ecc71', fillColor: '#2ecc71' },
+  'Afrique du Nord': { color: '#e67e22', fillColor: '#e67e22' },
+  'Europe Balcanique': { color: '#8e44ad', fillColor: '#8e44ad' },
+  'Micronésie': { color: '#1abc9c', fillColor: '#1abc9c' },
+  'Asie du Sud Est': { color: '#9c27b0', fillColor: '#9c27b0' },
+  'Asie Centrale': { color: '#795548', fillColor: '#795548' },
+  'Amérique du Nord': { color: '#2c3e50', fillColor: '#2c3e50' },
+  'Amérique du Sud': { color: '#4caf50', fillColor: '#4caf50' },
+  'Antilles': { color: '#00bcd4', fillColor: '#00bcd4' },
+  'Polynésie': { color: '#009688', fillColor: '#009688' }
 }
 
 // Fonction pour obtenir la couleur d'une culture
 const getCultureColor = (cultureName) => {
+  // Correspondance exacte
+  if (CULTURE_COLORS[cultureName]) {
+    return CULTURE_COLORS[cultureName]
+  }
+  
   // Chercher une correspondance partielle
   const cultureKey = Object.keys(CULTURE_COLORS).find(key => 
-    cultureName?.toLowerCase().includes(key.toLowerCase())
+    cultureName?.toLowerCase().includes(key.toLowerCase()) ||
+    key.toLowerCase().includes(cultureName?.toLowerCase())
   )
   
   if (cultureKey) {
@@ -54,6 +142,35 @@ const getCultureColor = (cultureName) => {
   let hash = 0
   for (let i = 0; i < (cultureName || '').length; i++) {
     hash = cultureName.charCodeAt(i) + ((hash << 5) - hash)
+  }
+  const hue = hash % 360
+  return {
+    color: `hsl(${hue}, 65%, 55%)`,
+    fillColor: `hsl(${hue}, 65%, 55%)`
+  }
+}
+
+// Fonction pour obtenir la couleur d'une région
+const getRegionColor = (regionName) => {
+  // Correspondance exacte
+  if (REGION_COLORS[regionName]) {
+    return REGION_COLORS[regionName]
+  }
+  
+  // Chercher une correspondance partielle
+  const regionKey = Object.keys(REGION_COLORS).find(key => 
+    regionName?.toLowerCase().includes(key.toLowerCase()) ||
+    key.toLowerCase().includes(regionName?.toLowerCase())
+  )
+  
+  if (regionKey) {
+    return REGION_COLORS[regionKey]
+  }
+  
+  // Couleur par défaut basée sur hash du nom
+  let hash = 0
+  for (let i = 0; i < (regionName || '').length; i++) {
+    hash = regionName.charCodeAt(i) + ((hash << 5) - hash)
   }
   const hue = hash % 360
   return {
@@ -320,14 +437,123 @@ function MapPage() {
   const [activeLayers, setActiveLayers] = useState({
     mythes: true,
     diffusion: false,
-    cultures: false,
+    culture: false,
     regions: false
   })
+  const [activeFilters, setActiveFilters] = useState({
+      culture: 'all',
+      region: 'all',
+      theme: 'all',
+      creature: 'all'
+  })
+  const [activeDiffusionMyth, setActiveDiffusionMyth] = useState(null)
   const [diffusions, setDiffusions] = useState([])
+  const [wasDiffusionActiveBeforeToggle, setWasDiffusionActiveBeforeToggle] = useState(false)
+  const [regions, setRegions] = useState([])
+  const [highlightedMyth, setHighlightedMyth] = useState(null)
   const [culturePolygons, setCulturePolygons] = useState([])
   const [regionPolygons, setRegionPolygons] = useState([])
   const [isMobile, setIsMobile] = useState(window.innerWidth < 768)
   const mapRef = useRef(null)
+  const redIcon = new L.Icon({
+  iconUrl: 'https://raw.githubusercontent.com/pointhi/leaflet-color-markers/master/img/marker-icon-2x-red.png',
+  shadowUrl: 'https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.7.1/images/marker-shadow.png',
+  iconSize: [25, 41],
+  iconAnchor: [12, 41],
+  popupAnchor: [1, -34],
+  shadowSize: [41, 41]
+})
+const handleSidebarClose = () => {
+  setSelectedMyth(null)
+  setHighlightedMyth(null)
+  
+  if (activeDiffusionMyth) {
+    setActiveDiffusionMyth(null)
+    
+    if (!wasDiffusionActiveBeforeToggle) {
+      setActiveLayers(prev => ({ ...prev, diffusion: false }))
+    }
+  }
+}
+
+const handleToggleDiffusion = (mythId, isActive) => {
+  if (isActive) {
+    // MÉMORISER l'état LayerControl
+    setWasDiffusionActiveBeforeToggle(activeLayers.diffusion)
+    
+    setActiveDiffusionMyth(mythId)
+    
+    if (!activeLayers.diffusion) {
+      setActiveLayers(prev => ({ ...prev, diffusion: true }))
+    }
+  } else {
+    setActiveDiffusionMyth(null)
+    
+    // RETOURNER à l'état initial
+    if (!wasDiffusionActiveBeforeToggle) {
+      setActiveLayers(prev => ({ ...prev, diffusion: false }))
+    }
+  }
+}
+
+const visibleDiffusions = useMemo(() => {
+  console.log('🔄 Calcul visibleDiffusions:', {
+    layerControl: activeLayers.diffusion,
+    mytheSidebarActive: activeDiffusionMyth
+  })
+  
+  // CAS 1: Un mythe a activé ses diffusions via toggle
+  // → Priorité absolue, afficher TOUJOURS ses diffusions
+  if (activeDiffusionMyth) {
+    console.log('   ✅ Diffusions du mythe', activeDiffusionMyth)
+    return diffusions.filter(d => d.id_mythe === activeDiffusionMyth)
+  }
+  
+  // CAS 2: LayerControl activé, afficher toutes les diffusions
+  if (activeLayers.diffusion) {
+    console.log('   ✅ Toutes les diffusions (LayerControl)')
+    return diffusions
+  }
+  
+  // CAS 3: Rien activé
+  console.log('   ❌ Aucune diffusion')
+  return []
+}, [activeLayers.diffusion, activeDiffusionMyth, diffusions])
+
+const visibleCultures = useMemo(() => {
+  if (!activeLayers.cultures) {
+    return []
+  }
+  
+  const cultureIds = new Set(
+    filteredMythes.map(m => m.id_culture).filter(Boolean)
+  )
+  
+  return culturePolygons.filter(cultPoly => 
+    cultureIds.has(cultPoly.id_culture)
+  )
+}, [filteredMythes, culturePolygons, activeLayers.cultures])
+  
+  const visibleRegions = useMemo(() => {
+    if (!activeLayers.regions) {
+      return []
+    }
+    
+    const regionIds = new Set()
+    
+    filteredMythes.forEach(myth => {
+      myth.regions?.forEach(r => {
+        if (r && r.id_region) {
+          regionIds.add(r.id_region)
+        }
+      })
+    })
+    
+    return regionPolygons.filter(regPoly => 
+      regionIds.has(regPoly.id_region)
+    )
+  }, [filteredMythes, regionPolygons, activeLayers.regions])
+
 
   // Chargement des mythes
   useEffect(() => {
@@ -359,43 +585,77 @@ function MapPage() {
   useEffect(() => {
     // Filtre depuis bibliothèque
     const storedFilter = sessionStorage.getItem('mapFilter')
+
     if (storedFilter && !loading && allMythes.length > 0) {
     const filter = JSON.parse(storedFilter)
     console.log('📍 Filtre depuis bibliothèque:', filter)
     
     let filtered = [...allMythes]
     
-    // Filtrer selon le type
+    // CULTURE
     if (filter.type === 'culture') {
       filtered = allMythes.filter(m => 
         m.culture?.nom_culture === filter.value ||
         m.id_culture === filter.id
       )
       setActiveLayers(prev => ({ ...prev, cultures: true }))
+      
+      // ===== AJOUTER ZOOM SUR CULTURE =====
+      setTimeout(() => {
+        const culturePoly = culturePolygons.find(c => 
+          c.id_culture === filter.id || c.nom_culture === filter.value
+        )
+        if (culturePoly && mapRef.current) {
+          // Calculer le centre du polygone
+          const bounds = L.geoJSON(culturePoly.geom).getBounds()
+          mapRef.current.fitBounds(bounds, { padding: [50, 50] })
+        }
+      }, 500)
     }
+
+    // THEME
     else if (filter.type === 'theme') {
       filtered = allMythes.filter(m => 
         m.theme?.nom_theme === filter.value ||
         m.id_theme === filter.id
       )
     }
+
+    // CREATURE
     else if (filter.type === 'creature') {
       filtered = allMythes.filter(m => {
         const creatureName = m.creature?.nom_creature || m.creature?.nom || m.creature?.type_creature
         return creatureName === filter.value || m.id_typologie === filter.id
       })
     }
+
+    // FAMILLE DE CRÉATURE
     else if (filter.type === 'famille') {
       filtered = allMythes.filter(m => 
         m.creature?.id_famille_creature === filter.id
       )
     }
+
+    // RÉGION
     else if (filter.type === 'region') {
-      filtered = allMythes.filter(m => 
-        m.region?.nom_region === filter.value ||
-        m.region?.id_region === filter.id
-      )
+      filtered = allMythes.filter(m => {
+        return m.regions?.some(r => 
+          r.nom_region === filter.value || 
+          r.id_region === filter.id
+        )
+      })
       setActiveLayers(prev => ({ ...prev, regions: true }))
+      
+      // ===== AJOUTER ZOOM SUR RÉGION =====
+      setTimeout(() => {
+        const regionPoly = regionPolygons.find(r => 
+          r.id_region === filter.id || r.nom_region === filter.value
+        )
+        if (regionPoly && mapRef.current) {
+          const bounds = L.geoJSON(regionPoly.geom).getBounds()
+          mapRef.current.fitBounds(bounds, { padding: [50, 50] })
+        }
+      }, 500)
     }
     
     console.log(`✅ Filtrage: ${filtered.length} mythes affichés`)
@@ -412,24 +672,51 @@ function MapPage() {
   
   // Mythe depuis galerie
   const storedMyth = sessionStorage.getItem('selectedMyth')
-  if (storedMyth && !loading && allMythes.length > 0) {
-    const myth = JSON.parse(storedMyth)
-    const fullMyth = allMythes.find(m => m.id_mythe === myth.id_mythe)
+if (storedMyth && !loading && allMythes.length > 0) {
+  console.log('🎯 Navigation mythe détectée')
+  
+  const myth = JSON.parse(storedMyth)
+  const fullMyth = allMythes.find(m => m.id_mythe === myth.id_mythe)
+  
+  if (fullMyth) {
+    setSelectedMyth(fullMyth)
+    setHighlightedMyth(fullMyth.id_mythe)
     
-    if (fullMyth) {
-      setSelectedMyth(fullMyth)
-      
-      const coords = getCoords(fullMyth.geom)
-      if (coords && mapRef.current) {
-        setTimeout(() => {
-          mapRef.current.setView(coords, 8, { animate: true })
-        }, 500)
+    const coords = getCoords(fullMyth.geom)
+    console.log('   coords calculées:', coords)
+    
+    if (coords) {
+        // POLLING: Réessayer jusqu'à ce que mapRef soit prêt
+        let attempts = 0
+        const maxAttempts = 20  // 4 secondes max (20 × 200ms)
+        
+        const tryZoom = () => {
+          attempts++
+          console.log(`🔄 Tentative zoom ${attempts}/${maxAttempts}`)
+          
+          if (mapRef.current) {
+            console.log('✅ Carte prête! Zoom sur:', coords)
+            mapRef.current.setView(coords, 10, { animate: true })
+          } else if (attempts < maxAttempts) {
+            console.log('   Carte pas prête, réessai dans 200ms...')
+            setTimeout(tryZoom, 200)  // Réessayer après 200ms
+          } else {
+            console.error('❌ TIMEOUT: Carte non prête après 4 secondes')
+          }
+        }
+        
+        // Commencer les tentatives après 300ms (laisser React finir le render)
+        setTimeout(tryZoom, 300)
+      } else {
+        console.error('❌ Pas de coordonnées pour ce mythe')
       }
+    } else {
+      console.error('❌ Mythe non trouvé dans allMythes')
     }
-    
-    sessionStorage.removeItem('selectedMyth')
-  }
-}, [allMythes, loading])
+  
+  sessionStorage.removeItem('selectedMyth')
+}
+}, [allMythes, loading, culturePolygons, regionPolygons])
 
 
   const loadMythes = async () => {
@@ -440,29 +727,46 @@ function MapPage() {
     
     const culturesUniques = [...new Map(
       data.map(m => m.culture).filter(Boolean).map(c => [c.id_culture, c])
-    ).values()].sort((a, b) => (a.nom_culture || '').localeCompare(b.nom_culture || ''))
+    ).values()]
 
     const themesUniques = [...new Map(
       data.map(m => m.theme).filter(Boolean).map(t => [t.id_theme, t])
-    ).values()].sort((a, b) => (a.nom_theme || '').localeCompare(b.nom_theme || ''))
+    ).values()]
 
     const creaturesUniques = [...new Map(
-      data.map(m => m.creature).filter(Boolean).map(c => [c.id_typologie, c])
-    ).values()].sort((a, b) => {
-      const nameA = a.nom_creature || a.nom || a.type_creature || ''
-      const nameB = b.nom_creature || b.nom || b.type_creature || ''
-      return nameA.localeCompare(nameB)
-    })
+      data.map(m => m.creature).filter(Boolean).map(cr => [cr.id_typologie, cr])
+    ).values()]
 
     setCultures(culturesUniques)
     setThemes(themesUniques)
     setCreatures(creaturesUniques)
+
+    const { data: regionsData } = await supabase
+    .from('region')
+    .select('id_region, nom_region')
+    .order('nom_region')
+
+    setRegions(regionsData || [])
     
     setLoading(false)
   }
 
-  const handleFilterChange = useCallback((filtered) => {
+  const handleFilterChange = useCallback((filtered, filters) => {
+    console.log('🎛️ Filtres actifs:', filters)
+    
     setFilteredMythes(filtered)
+    
+    // VÉRIFIER que filters existe
+    if (filters) {
+      setActiveFilters(filters)
+      
+      // AUTO-ACTIVER/DÉSACTIVER les couches
+      setActiveLayers(prev => ({
+        ...prev,
+        cultures: filters.culture !== 'all',
+        regions: filters.region !== 'all'
+      }))
+    }
   }, [])
 
   const handleTimeFilterChange = useCallback((timeFiltered) => {
@@ -496,6 +800,7 @@ function MapPage() {
         cultures={cultures}
         themes={themes}
         creatures={creatures}
+        regions={regions}
         externalFilter={externalFilter}
       />
 
@@ -514,6 +819,7 @@ function MapPage() {
           maxBoundsViscosity={1.0}
           whenCreated={(map) => { mapRef.current = map }}
         >
+          <MapRefSetter mapRef={mapRef} />
           <TileLayer
             key={currentBasemap.id}
             url={currentBasemap.url}
@@ -521,7 +827,7 @@ function MapPage() {
           />
           
           {/* ==================== COUCHE DIFFUSION ==================== */}
-          {activeLayers.diffusion && diffusions.map((diff, diffIndex) => {
+          {activeLayers.diffusion && visibleDiffusions.map((diff, diffIndex) => {
             const parsed = parseGeometry(diff.geom, `Diffusion ${diffIndex}`)
             
             if (!parsed) return null
@@ -530,6 +836,41 @@ function MapPage() {
               const validCoords = validateCoords(coords)
               if (validCoords.length < 2) return null
               
+              // Fonction de clic
+              const handleDiffusionClick = () => {
+                console.log('🖱️ Clic sur diffusion:', diff)
+                console.log('   - diff.id_mythe:', diff.id_mythe)
+                console.log('   - diff.mythe:', diff.mythe)
+                
+                // Essayer plusieurs propriétés possibles
+                const mytheId = diff.id_mythe || diff.mythes?.id_mythe || diff.id_myth
+                
+                console.log('   - mytheId trouvé:', mytheId)
+                
+                if (mytheId) {
+                  // Trouver le mythe complet
+                  const fullMyth = allMythes.find(m => m.id_mythe === mytheId)
+                  
+                  console.log('   - fullMyth trouvé:', fullMyth)
+                  
+                  if (fullMyth) {
+                    console.log('   ✅ Ouverture du mythe:', fullMyth.nom_mythe)
+                    setHighlightedMyth(fullMyth.id_mythe)  // ← Rend le marker rouge
+                    setSelectedMyth(fullMyth)               // ← Ouvre le sidebar
+                    
+                    // Centrer sur le mythe
+                    const coords = getCoords(fullMyth.geom)
+                    if (coords && mapRef.current) {
+                      mapRef.current.setView(coords, 10, { animate: true })
+                    }
+                  } else {
+                    console.error('   ❌ Mythe non trouvé dans allMythes')
+                  }
+                } else {
+                  console.error('   ❌ Pas d\'id_mythe sur cette diffusion')
+                }
+              }
+
               return (
                   <Polyline
                     key={key}
@@ -539,6 +880,9 @@ function MapPage() {
                   opacity={0.8}
                   dashArray="10, 5"
                   className="animated-diffusion-line"
+                  eventHandlers={{
+                    click: handleDiffusionClick
+                  }}
                   >
                   <style jsx>{`
                     @keyframes dash {
@@ -762,7 +1106,7 @@ function MapPage() {
           })}
 
           {/* ==================== COUCHE CULTURES ==================== */}
-          {activeLayers.cultures && culturePolygons.map((cult, cultIndex) => {
+          {activeLayers.cultures && visibleCultures.map((cult, cultIndex) => {
             const parsed = parseGeometry(cult.geom, `Culture: ${cult.nom_culture}`)
             
             if (!parsed) return null
@@ -866,7 +1210,7 @@ function MapPage() {
           })}
 
           {/* ==================== COUCHE RÉGIONS ==================== */}
-          {activeLayers.regions && regionPolygons.map((reg, regIndex) => {
+          {activeLayers.regions && visibleRegions.map((reg, regIndex) => {
             const parsed = parseGeometry(reg.geom, `Région: ${reg.nom_region}`)
             
             if (!parsed) return null
@@ -876,22 +1220,23 @@ function MapPage() {
               
               if (validCoords.length < 3) return null
               
-              const mythesInRegion = validMythes.filter(m => {
-                return m.region?.nom_region === reg.nom_region
-              }).length
+              const colors = getCultureColor(reg.nom_region)
+              const mythesInRegion = filteredMythes.filter(m => 
+                m.regions?.some(r => r.id_region === reg.id_region)
+              ).length
               
               return (
                 <Polygon
                   key={key}
                   positions={validCoords}
-                  color="#27ae60"
-                  fillColor="#27ae60"
+                  color={colors.color}
+                  fillColor={colors.fillColor}
                   fillOpacity={0.2}
                   weight={2}
                 >
                   <Popup>
                     <div style={{ minWidth: '220px' }}>
-                      <strong style={{ fontSize: '16px', color: '#27ae60' }}>
+                      <strong style={{ fontSize: '16px', color: colors.color }}>
                         📍 {reg.nom_region}
                       </strong>
                       
@@ -900,13 +1245,13 @@ function MapPage() {
                         padding: '10px', 
                         background: '#f0fff4', 
                         borderRadius: '6px',
-                        borderLeft: '3px solid #27ae60'
+                        borderLeft: `3px solid ${colors.color}`
                       }}>
-                        <div style={{ fontSize: '24px', fontWeight: 'bold', color: '#27ae60' }}>
+                        <div style={{ fontSize: '24px', fontWeight: 'bold', color: colors.color }}>
                           {mythesInRegion}
                         </div>
                         <div style={{ fontSize: '13px', color: '#666' }}>
-                          mythe{mythesInRegion > 1 ? 's' : ''} dans cette zone
+                          mythe{mythesInRegion > 1 ? 's' : ''} affiché{mythesInRegion > 1 ? 's' : ''}
                         </div>
                       </div>
                       
@@ -958,31 +1303,44 @@ function MapPage() {
           <MarkerClusterGroup>
             {validMythes.map((myth) => {
               const coords = getCoords(myth.geom)
+              const isHighlighted = highlightedMyth === myth.id_mythe
               
                 return (
                 <Marker
                   key={myth.id_mythe}
                   position={coords}
+                  icon={isHighlighted ? redIcon : undefined} // <-- ICÔNE ROUGE SI HIGHLIGHTED
                   eventHandlers={{
-                  click: () => setSelectedMyth(myth)
+                  click: () => {
+                    setSelectedMyth(myth)
+                    setHighlightedMyth(myth.id_mythe)
+                  }
                   }}
                 >
-                  <Popup>
-                  <strong style={{ color: '#F6AA1C' }}>
+                  <Popup> 
+                  <strong style={{ color: isHighlighted ? '#e74c3c' : '#F6AA1C' }}>
                     {myth.nom_mythe}
                   </strong> 
+                  {myth.culture && (
+                    <p style={{ margin: '5px 0', fontSize: '0.9em' }}>
+                      📍 {myth.culture.nom_culture}
+                    </p>
+                  )}
                   <div style={{ height: '10px' }} />
                   <button
-                    onClick={() => setSelectedMyth(myth)}
+                    onClick={() => {
+                      setSelectedMyth(myth)
+                      setHighlightedMyth(myth.id_mythe)
+                    }}
                     style={{
-                    marginTop: '10px',
-                    padding: '5px 12px',
-                    background: '#F6AA1C',
-                    color: 'white',
-                    border: 'none',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '12px'
+                      marginTop: '10px',
+                      padding: '5px 12px',
+                      background: '#F6AA1C',
+                      color: 'white',
+                      border: 'none',
+                      borderRadius: '4px',
+                      cursor: 'pointer',
+                      fontSize: '12px'
                     }}
                   >
                     Voir plus
@@ -1036,7 +1394,8 @@ function MapPage() {
 
       <MythSidebar 
         myth={selectedMyth} 
-        onClose={() => setSelectedMyth(null)} 
+        onClose={handleSidebarClose}
+        onToggleDiffusion={handleToggleDiffusion}
       />
     </div>
   )

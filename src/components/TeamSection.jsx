@@ -5,7 +5,7 @@ function TeamSection() {
     {
       name: 'Bryan',
       role: 'Data-Engineer & Full stack-Developpeur',
-      image: 'https://media.licdn.com/dms/image/v2/D4E03AQEv20v6D25yhQ/profile-displayphoto-crop_800_800/B4EZejsEqxG4AM-/0/1750797929832?e=1770854400&v=beta&t=GZHD9xoyZxKZ6f5CN8PwMvpWRecbuNVdcceQDxn0fGY',
+      image: '/Bryan.jpg',
       description: 'Passionné par la création, la structuration de données, la conception de data-pipelines et le développement de sites web en React',
       skills: ['VS code', 'Database', 'REACT'],
       color: '#667eea', 
@@ -14,7 +14,7 @@ function TeamSection() {
     {
       name: 'Adama',
       role: 'Scrum Master Designer',
-      image: 'https://media.licdn.com/dms/image/v2/D4E03AQE6rgxiRE-FJQ/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1708025656741?e=1770854400&v=beta&t=YlNt5t0uBtJnyJdOZQej_SxTu0lu4_ApPQ3xFRSS1ss',
+      image: '/Adama.jpg',
       description: 'Coordination de l’équipe en tant que Scrum Master, supervision du respect de la méthode agile, conception du design de l’application et contribution à l’enrichissement de la base de données',
       skills: ['Visual Studio Code', 'Python', 'QGIS', 'Jira'],
       color: '#e74c3c',
@@ -23,16 +23,16 @@ function TeamSection() {
     {
       name: 'Sewedo',
       role: 'Designer & Chercheur',
-      image: 'https://media.licdn.com/dms/image/v2/D4D03AQHKEY_xGKqfDA/profile-displayphoto-shrink_800_800/profile-displayphoto-shrink_800_800/0/1728637374542?e=1770854400&v=beta&t=1BGBUBICnb6iQimowzmhSN9_tOhJvKz37lwbm5luVBs',
+      image: '/Sewedo.jpg',
       description: 'Spécialiste en design d\'interfaces et recherche ethnographique. Création du système visuel et documentation des mythes.',
       skills: ['UI/UX', 'Recherche', 'Design'],
       color: '#F6AA1C',
-      linkedin: 'https://www.linkedin.com/in/astyanax-g-aa8578195/'
+      linkedin: 'https://www.linkedin.com/in/sewedo-g-aa8578195/'
     },
     {
       name: 'Rafael',
       role: 'Développeur Frontend',
-      image: 'https://media.licdn.com/dms/image/v2/D4E03AQERKwJlPWjniQ/profile-displayphoto-scale_400_400/B4EZm9X2GsHIAg-/0/1759818769337?e=1770854400&v=beta&t=0VkQRqJBEuPNCiTitJKbwth82a9fyTb3gEExKUIojSc',
+      image: '/Rafael.jpg',
       description: 'Expert en visualisation de données et animations. Développement des composants interactifs et de la timeline.',
       skills: ['JavaScript', 'D3.js', 'Animation'],
       color: '#27ae60', 

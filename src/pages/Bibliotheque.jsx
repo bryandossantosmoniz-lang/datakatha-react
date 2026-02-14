@@ -251,10 +251,36 @@ function Bibliotheque() {
       const { data: regionsData } = await supabase
         .from('region')
         .select('*')
-      
+
+      // Récupérer mythes avec leur culture
       const { data: mythes } = await supabase
         .from('mythes')
-        .select('id_culture, id_theme, id_typologie')
+        .select('id_mythe, id_culture, id_theme, id_typologie')
+
+      // Récupérer table pivot culture_region
+      const { data: cultureRegions } = await supabase
+        .from('culture_region')
+        .select('id_culture, id_region')
+
+      // Compter mythes par région
+      const regionCounts = {}
+      regionsData?.forEach(r => {
+        regionCounts[r.id_region] = 0
+      })
+
+      mythes?.forEach(myth => {
+        // Trouver les régions de cette culture
+        const regionsOfCulture = cultureRegions?.filter(cr => 
+          cr.id_culture === myth.id_culture
+        )
+        
+        // Incrémenter chaque région
+        regionsOfCulture?.forEach(cr => {
+          if (regionCounts[cr.id_region] !== undefined) {
+            regionCounts[cr.id_region]++
+          }
+        })
+      })
 
       setCultures(culturesData?.map(c => ({
         name: c.nom_culture,
@@ -290,9 +316,11 @@ function Bibliotheque() {
         type: 'famille'
       })) || [])
 
+      // RÉGIONS avec comptage corrigé
       setRegions(regionsData?.map(r => ({
         name: r.nom_region,
         description: r.resume_region,
+        count: regionCounts[r.id_region] || 0,
         id: r.id_region,
         type: 'region'
       })) || [])

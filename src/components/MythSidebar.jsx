@@ -1,15 +1,19 @@
+// Dans MythSidebar.jsx
+
 import { useState, useEffect } from 'react'
-import { getMythImages } from '../services/supabase'
+import { getMythImages, supabase } from '../services/supabase'
 import TextToSpeech from './TextToSpeech'
 
-function MythSidebar({ myth, onClose }) {
+function MythSidebar({ myth, onClose, onToggleDiffusion }) {  // <-- AJOUTER onToggleDiffusion prop
   const [images, setImages] = useState([])
   const [loadingImages, setLoadingImages] = useState(true)
+  const [hasDiffusion, setHasDiffusion] = useState(false)
+  const [diffusionActive, setDiffusionActive] = useState(false)
 
-  // Charger les images quand le mythe change
   useEffect(() => {
     if (myth?.id_mythe) {
       loadImages()
+      checkDiffusion()
     }
   }, [myth?.id_mythe])
 
@@ -20,9 +24,28 @@ function MythSidebar({ myth, onClose }) {
     setLoadingImages(false)
   }
 
+  // Vérifier si le mythe a des diffusions
+  const checkDiffusion = async () => {
+    const { data } = await supabase
+      .from('diffusion')
+      .select('id_diffusion')
+      .eq('id_mythe', myth.id_mythe)
+      .limit(1)
+    
+    setHasDiffusion(data && data.length > 0)
+  }
+
+  // Toggle diffusion
+  const handleToggleDiffusion = () => {
+    const newState = !diffusionActive
+    setDiffusionActive(newState)
+    if (onToggleDiffusion) {
+      onToggleDiffusion(myth.id_mythe, newState)
+    }
+  }
+
   if (!myth) return null
 
-  // Image principale : soit depuis media, soit depuis créature
   const mainImage = images.length > 0 ? images[0].url : myth.creature?.URL_image
 
   return (
@@ -56,7 +79,7 @@ function MythSidebar({ myth, onClose }) {
         ×
       </button>
 
-      {/* IMAGE EN HAUT */}
+      {/* Image */}
       {loadingImages ? (
         <div style={{
           height: '250px',
@@ -66,36 +89,18 @@ function MythSidebar({ myth, onClose }) {
           justifyContent: 'center',
           color: 'white'
         }}>
-          Chargement de l'image...
+          Chargement...
         </div>
       ) : mainImage ? (
-        <div style={{ position: 'relative' }}>
-          <img 
-            src={mainImage} 
-            alt={myth.nom_mythe} 
-            style={{ 
-              width: '100%', 
-              height: '250px',
-              objectFit: 'cover'
-            }} 
-          />
-          {/* Badge nombre d'images */}
-          {images.length > 1 && (
-            <div style={{
-              position: 'absolute',
-              bottom: '10px',
-              right: '10px',
-              background: 'rgba(0,0,0,0.8)',
-              color: 'white',
-              padding: '5px 12px',
-              borderRadius: '15px',
-              fontSize: '12px',
-              fontWeight: '600'
-            }}>
-              🖼️ {images.length} photos
-            </div>
-          )}
-        </div>
+        <img 
+          src={mainImage} 
+          alt={myth.nom_mythe} 
+          style={{ 
+            width: '100%', 
+            height: '250px',
+            objectFit: 'cover'
+          }} 
+        />
       ) : (
         <div style={{
           height: '250px',
@@ -136,56 +141,77 @@ function MythSidebar({ myth, onClose }) {
           </div>
         )}
 
-        {/* Galerie d'images (si plusieurs) */}
-        {images.length > 1 && (
-          <div style={{ marginBottom: '20px' }}>
-            <h4 style={{ fontSize: '14px', color: '#666', marginBottom: '10px' }}>
-              📸 Galerie ({images.length})
-            </h4>
+        {/* BOUTON TOGGLE DIFFUSION */}
+        {hasDiffusion && (
+          <div style={{
+            background: diffusionActive ? '#e8f4f8' : '#f8f9fa',
+            border: `2px solid ${diffusionActive ? '#3498db' : '#ddd'}`,
+            borderRadius: '12px',
+            padding: '15px',
+            marginBottom: '20px',
+            transition: 'all 0.3s'
+          }}>
             <div style={{
-              display: 'grid',
-              gridTemplateColumns: 'repeat(3, 1fr)',
-              gap: '8px'
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              marginBottom: '10px'
             }}>
-              {images.slice(1, 4).map((img, idx) => (
-                <img
-                  key={idx}
-                  src={img.url}
-                  alt={`${myth.nom_mythe} ${idx + 2}`}
-                  onClick={() => window.open(img.url, '_blank')}
-                  style={{
-                    width: '100%',
-                    height: '80px',
-                    objectFit: 'cover',
-                    borderRadius: '6px',
-                    cursor: 'pointer',
-                    transition: 'transform 0.2s'
-                  }}
-                  onMouseEnter={(e) => e.target.style.transform = 'scale(1.05)'}
-                  onMouseLeave={(e) => e.target.style.transform = 'scale(1)'}
-                />
-              ))}
-              {images.length > 4 && (
-                <div style={{
-                  width: '100%',
-                  height: '80px',
-                  borderRadius: '6px',
-                  background: '#f0f0f0',
-                  display: 'flex',
-                  alignItems: 'center',
-                  justifyContent: 'center',
-                  fontSize: '14px',
-                  fontWeight: 'bold',
-                  color: '#666'
-                }}>
-                  +{images.length - 4}
+              <div>
+                <div style={{ fontSize: '14px', fontWeight: '600', color: '#2c3e50' }}>
+                  🌊 Diffusion du mythe
                 </div>
-              )}
+                <div style={{ fontSize: '12px', color: '#7f8c8d', marginTop: '3px' }}>
+                  Voir les chemins de propagation
+                </div>
+              </div>
+              
+              {/* Toggle Switch */}
+              <button
+                onClick={handleToggleDiffusion}
+                style={{
+                  position: 'relative',
+                  width: '50px',
+                  height: '26px',
+                  background: diffusionActive ? '#3498db' : '#ccc',
+                  borderRadius: '13px',
+                  border: 'none',
+                  cursor: 'pointer',
+                  transition: 'background 0.3s',
+                  padding: 0
+                }}
+              >
+                <div style={{
+                  position: 'absolute',
+                  top: '3px',
+                  left: diffusionActive ? '26px' : '3px',
+                  width: '20px',
+                  height: '20px',
+                  background: 'white',
+                  borderRadius: '50%',
+                  transition: 'left 0.3s',
+                  boxShadow: '0 2px 4px rgba(0,0,0,0.2)'
+                }} />
+              </button>
             </div>
+            
+            {diffusionActive && (
+              <div style={{
+                fontSize: '11px',
+                color: '#3498db',
+                fontStyle: 'italic',
+                marginTop: '8px',
+                padding: '8px',
+                background: 'rgba(52, 152, 219, 0.1)',
+                borderRadius: '6px'
+              }}>
+                ✓ Les lignes de diffusion sont maintenant visibles sur la carte
+              </div>
+            )}
           </div>
         )}
 
-        {/* Lecteur audio */}
+        {/* TextToSpeech */}
         {myth.description_mythe && (
           <div style={{ marginBottom: '20px' }}>
             <TextToSpeech 

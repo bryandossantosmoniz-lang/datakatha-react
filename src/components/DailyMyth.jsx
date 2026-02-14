@@ -1,12 +1,15 @@
-import React, { useState, useEffect } from 'react'
+import { useState, useEffect } from 'react'
 import { getMythImages } from '../services/supabase'
 import { supabase } from '../services/supabase'
+import { useNavigate } from 'react-router-dom'
 
-function DailyMyth({ myth }) {
+function DailyMyth({ myth}) {
+  const navigate = useNavigate()
   const [todayMyth, setTodayMyth] = useState(null)
   const [loading, setLoading] = useState(true)
   const [images, setImages] = useState([])
   const [loadingImages, setLoadingImages] = useState(true)
+
   
   useEffect(() => {
     loadDailyMyth()
@@ -74,6 +77,11 @@ function DailyMyth({ myth }) {
 
   // Image principale : soit depuis media, soit depuis créature
   const mainImage = images.length > 0 ? images[0].url : null
+  
+  const handleNavigateToMap = () => {
+  sessionStorage.setItem('selectedMyth', JSON.stringify(todayMyth))
+  navigate('/carte')}
+
 
   return (
     <div style={{
@@ -214,34 +222,28 @@ function DailyMyth({ myth }) {
 
       {/* Bouton */}
       <button
-        onClick={() => window.location.href = '/carte'}
-        style={{
-          background: '#F6AA1C',
-          color: 'white',
-          border: 'none',
-          padding: '14px 30px',
-          borderRadius: '12px',
-          fontSize: '15px',
-          fontWeight: '600',
-          cursor: 'pointer',
-          boxShadow: '0 4px 15px rgba(246, 170, 28, 0.4)',
-          transition: 'all 0.3s ease',
-          display: 'inline-flex',
-          alignItems: 'center',
-          gap: '10px'
-        }}
-        onMouseEnter={(e) => {
-          e.currentTarget.style.transform = 'translateY(-2px)'
-          e.currentTarget.style.boxShadow = '0 6px 20px rgba(246, 170, 28, 0.6)'
-        }}
-        onMouseLeave={(e) => {
-          e.currentTarget.style.transform = 'translateY(0)'
-          e.currentTarget.style.boxShadow = '0 4px 15px rgba(246, 170, 28, 0.4)'
-        }}
-      >
-        <span>Découvrir sur la carte</span>
-        <span>→</span>
-      </button>
+      onClick={handleNavigateToMap}
+      style={{
+        width: '100%',
+        padding: '16px',
+        marginTop: '20px',
+        background: 'linear-gradient(135deg, #F6AA1C 0%, #e89f17 100%)',
+        color: 'white',
+        border: 'none',
+        borderRadius: '12px',
+        fontSize: '16px',
+        fontWeight: '600',
+        cursor: 'pointer',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        gap: '10px',
+        boxShadow: '0 4px 15px rgba(246, 170, 28, 0.3)'
+      }}
+    >
+      <span style={{ fontSize: '20px' }}>🗺️</span>
+      Voir sur la carte
+    </button>
 
       <style>
         {`

@@ -5,12 +5,14 @@ import React, { useState, useEffect } from 'react'
 function FilterPanel({ 
   mythes, 
   onFilterChange,
+  regions = [],
   cultures = [],
   themes = [],
   creatures = [],
-  externalFilter = null  // <-- AJOUTER CE PROP
+  externalFilter = null
 }) {
   const [filters, setFilters] = useState({
+    region: 'all',
     culture: 'all',
     theme: 'all',
     creature: 'all',
@@ -33,6 +35,9 @@ function FilterPanel({
       else if (externalFilter.type === 'creature' || externalFilter.type === 'famille') {
         setFilters(prev => ({ ...prev, creature: String(externalFilter.id) }))
       }
+      else if (externalFilter.type === 'region') {
+        setFilters(prev => ({ ...prev, region: String(externalFilter.id) }))
+      }
       
       // Ouvrir le panel pour montrer le filtre actif
       setIsOpen(true)
@@ -42,6 +47,13 @@ function FilterPanel({
   // Appliquer les filtres
   useEffect(() => {
     const filtered = mythes.filter(myth => {
+
+      // Filtre region
+      if (filters.region !== 'all') {
+        const hasRegion = myth.regions?.some(r => r.id_region === parseInt(filters.region))
+        if (!hasRegion) return false
+      }
+
       // Filtre culture
       if (filters.culture !== 'all' && myth.id_culture !== parseInt(filters.culture)) {
         return false
@@ -59,18 +71,18 @@ function FilterPanel({
 
       // Filtre recherche
       if (filters.search) {
-        const searchLower = filters.search.toLowerCase()
-        const nomMatch = myth.nom_mythe?.toLowerCase().includes(searchLower)
-        const descMatch = myth.description_mythe?.toLowerCase().includes(searchLower)
-        if (!nomMatch && !descMatch) {
-          return false
-        }
+      const searchLower = filters.search.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+      const nomMatch = myth.nom_mythe?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(searchLower);
+      const descMatch = myth.description_mythe?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(searchLower);
+      if (!nomMatch && !descMatch) {
+        return false;
       }
+    }
 
       return true
     })
 
-    onFilterChange(filtered)
+    onFilterChange(filtered, filters)
   }, [filters, mythes, onFilterChange])
 
   const handleFilterChange = (key, value) => {
@@ -82,6 +94,7 @@ function FilterPanel({
       culture: 'all',
       theme: 'all',
       creature: 'all',
+      region: 'all',
       search: ''
     })
   }
@@ -171,7 +184,7 @@ function FilterPanel({
             fontSize: '13px'
           }}>
             <div style={{ fontWeight: '600', marginBottom: '5px' }}>
-              📌 Filtre actif depuis la bibliothèque
+              📌 Filtre actif 
             </div>
             <div style={{ opacity: 0.9 }}>
               {externalFilter.type} : {externalFilter.value}
@@ -209,6 +222,43 @@ function FilterPanel({
               transition: 'all 0.2s'
             }}
           />
+        </div>
+
+        {/* Region */}
+        <div style={{ marginBottom: '20px' }}>
+          <label style={{
+            display: 'block',
+            marginBottom: '8px',
+            fontSize: '13px',
+            fontWeight: '500',
+            textTransform: 'uppercase',
+            letterSpacing: '0.5px',
+            color: '#F6AA1C'
+          }}>
+            Région
+          </label>
+          <select
+            value={filters.region}
+            onChange={(e) => handleFilterChange('region', e.target.value)}
+            style={{
+              width: '100%',
+              padding: '10px 12px',
+              borderRadius: '6px',
+              border: filters.region !== 'all' ? '2px solid #F6AA1C' : '1px solid rgba(255,255,255,0.2)',
+              background: 'rgba(255,255,255,0.1)',
+              color: 'white',
+              fontSize: '14px',
+              cursor: 'pointer',
+              outline: 'none'
+            }}
+          >
+            <option value="all" style={{ background: '#34495e' }}>Toutes les régions</option>
+            {regions.map(r => (
+              <option key={r.id_region} value={r.id_region} style={{ background: '#34495e' }}>
+                {r.nom_region}
+              </option>
+            ))}
+          </select>
         </div>
 
         {/* Culture */}
@@ -360,6 +410,7 @@ function FilterPanel({
               if (filters.culture !== 'all' && myth.id_culture !== parseInt(filters.culture)) return false
               if (filters.theme !== 'all' && myth.id_theme !== parseInt(filters.theme)) return false
               if (filters.creature !== 'all' && myth.id_typologie !== parseInt(filters.creature)) return false
+              if (filters.region !== 'all' && !myth.regions?.some(r => r.id_region === parseInt(filters.region))) return false
               if (filters.search) {
                 const searchLower = filters.search.toLowerCase()
                 const nomMatch = myth.nom_mythe?.toLowerCase().includes(searchLower)

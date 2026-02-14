@@ -5,7 +5,7 @@ const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY
 
 export const supabase = createClient(supabaseUrl, supabaseKey)
 
-// VERSION ULTRA SAFE - SEULEMENT CE QUI MARCHE À 100%
+// Récupération des mythes : sélection type SQL
 export const getMythes = async () => {
   const { data, error } = await supabase
     .from('mythes')
@@ -46,9 +46,21 @@ export const getMythes = async () => {
     .from('creature')
     .select('*')
 
+  // Récupérer table pivot culture_region
+  const { data: cultureRegions } = await supabase
+    .from('culture_region')
+    .select('id_culture, id_region')
+
+  // Récupérer régions
+  const { data: regions } = await supabase
+    .from('region')
+    .select('*')
+
   console.log('📚 Cultures:', cultures)
   console.log('🎨 Themes:', themes)
   console.log('🐉 Creatures:', creatures)
+  console.log('🌍 Culture-Region:', cultureRegions)
+  console.log('📍 Regions:', regions)
 
   // Créer des maps pour lookup rapide
   const cultureMap = {}
@@ -64,6 +76,18 @@ export const getMythes = async () => {
   const creatureMap = {}
   creatures?.forEach(cr => {
     creatureMap[cr.id_typologie] = cr
+  })
+
+  const regionMap = {}
+  regions?.forEach(r => { regionMap[r.id_region] = r })
+
+  // Map culture → regions
+  const cultureToRegionsMap = {}
+  cultureRegions?.forEach(cr => {
+    if (!cultureToRegionsMap[cr.id_culture]) {
+      cultureToRegionsMap[cr.id_culture] = []
+    }
+    cultureToRegionsMap[cr.id_culture].push(regionMap[cr.id_region])
   })
 
   // Convertir les géométries ET ajouter les données liées
@@ -95,11 +119,13 @@ export const getMythes = async () => {
       geom: geomParsed,
       culture: cultureMap[myth.id_culture] || null,
       theme: themeMap[myth.id_theme] || null,
-      creature: creatureMap[myth.id_typologie] || null
+      creature: creatureMap[myth.id_typologie] || null,
+      regions: cultureToRegionsMap[myth.id_culture] || []
     }
   })
 
   console.log('✅ Mythes enrichis:', mythesAvecTout)
+
   return mythesAvecTout
 }
 
@@ -111,7 +137,7 @@ export function getCoords(geom) {
   return [lat, lng]
 }
 
-// Récupérer diffusions
+// Récupérer diffusions et jointure avec mythes 
 export const getDiffusions = async () => {
   const { data, error } = await supabase
     .from('diffusion')
@@ -159,7 +185,7 @@ export const getDiffusions = async () => {
 export const getCulturePolygons = async () => {
   const { data, error } = await supabase
     .from('culture')
-    .select('nom_culture, geom')
+    .select('id_culture, nom_culture, geom') 
   if (error) console.error('Erreur cultures:', error)
   return data || []
 }
@@ -168,7 +194,7 @@ export const getCulturePolygons = async () => {
 export const getRegionPolygons = async () => {
   const { data, error } = await supabase
     .from('region')
-    .select('nom_region, geom')
+    .select('id_region, nom_region, geom') 
   if (error) console.error('Erreur régions:', error)
   return data || []
 }
@@ -185,4 +211,56 @@ export const getMythImages = async (idMythe) => {
   }
   
   return data || []
+}
+
+// FONCTION : Compter mythes par région
+export const countMythesByRegion = async () => {
+  // 1. Récupérer tous les mythes avec cultures
+  const { data: mythes } = await supabase
+    .from('mythes')
+    .select('id_mythe, id_culture')
+
+  // 2. Récupérer table pivot
+  const { data: cultureRegions } = await supabase
+    .from('culture_region')
+    .select('id_culture, id_region')
+
+  // 3. Récupérer régions
+  const { data: regions } = await supabase
+    .from('region')
+    .select('*')
+
+  // 4. Construire map région → count
+  const regionCounts = {}
+  regions?.forEach(r => {
+    regionCounts[r.id_region] = {
+      ...r,
+      count: 0
+    }
+  })
+
+  // 5. Compter
+  mythes?.forEach(myth => {
+    // Trouver les régions de cette culture
+    const regionsOfCulture = cultureRegions?.filter(cr => 
+      cr.id_culture === myth.id_culture
+    )
+    
+    // Incrémenter chaque région
+    regionsOfCulture?.forEach(cr => {
+      if (regionCounts[cr.id_region]) {
+        regionCounts[cr.id_region].count++
+      }
+    })
+  })
+
+  return Object.values(regionCounts)
+}
+
+// FONCTION : Filtrer mythes par région
+export const filterMythesByRegion = (mythes, regionId) => {
+  return mythes.filter(myth => {
+    // Vérifier si une des régions du mythe correspond
+    return myth.regions?.some(r => r.id_region === regionId)
+  })
 }
