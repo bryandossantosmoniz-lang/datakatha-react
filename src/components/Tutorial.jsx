@@ -68,6 +68,21 @@ const TUTORIAL_STEPS = [
   },
   {
     id: 9,
+    page: '/sites',
+    title: "Sites Touristiques 🏛️",
+    description: "Découvrez les lieux qui ont inspiré ou abritent les mythes du monde entier",
+    position: 'center'
+  },
+  {
+    id: 10,
+    page: '/a-propos',
+    title: "À Propos ℹ️",
+    description: "En savoir plus sur DATAKATHA",
+    position: 'center'
+  },
+
+  {
+    id: 11,
     page: null,
     title: "Vous êtes prêt ! 🚀",
     description: "Amusez-vous à explorer la mythologie mondiale !",
