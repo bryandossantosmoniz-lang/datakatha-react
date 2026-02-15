@@ -1,6 +1,6 @@
 import { useState } from 'react'
 
-function LayerControl({ onLayerChange, isMobile }) {
+function LayerControl({ onLayerChange, isMobile, className = '' }) {
   const [isOpen, setIsOpen] = useState(false)
   const [layers, setLayers] = useState({
     mythes: true,        // Couche principale (toujours visible)
@@ -21,14 +21,22 @@ function LayerControl({ onLayerChange, isMobile }) {
   }
 
   return (
-    <>
+    <div
+      className={className}
+      style={{
+        position: 'absolute',
+        top: isMobile ? '80px' : '20px',
+        right: isMobile ? '10px' : '20px',
+        zIndex: 1001,
+        minWidth: '100px',
+        minHeight: '44px'
+      }}
+    >
       {/* Bouton toggle */}
       <button
         onClick={() => setIsOpen(!isOpen)}
         style={{
-          position: 'absolute',
-          top: isMobile ? '80px' : '20px',
-          right: isMobile ? '10px' : '20px',
+          position: 'relative',
           zIndex: 1001,
           background: 'white',
           border: '2px solid #e0e0e0',
@@ -172,7 +180,7 @@ function LayerControl({ onLayerChange, isMobile }) {
           }
         `}
       </style>
-    </>
+    </div>
   )
 }
 

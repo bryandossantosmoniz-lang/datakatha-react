@@ -1,5 +1,3 @@
-// MODIFICATION DANS FilterPanel.jsx
-
 import React, { useState, useEffect } from 'react'
 
 function FilterPanel({ 
@@ -21,7 +19,7 @@ function FilterPanel({
 
   const [isOpen, setIsOpen] = useState(true)
 
-  // NOUVEAU: Synchroniser avec le filtre externe
+  // Synchroniser avec le filtre externe
   useEffect(() => {
     if (externalFilter) {
       console.log('🔄 Synchronisation filtre externe:', externalFilter)
@@ -39,7 +37,6 @@ function FilterPanel({
         setFilters(prev => ({ ...prev, region: String(externalFilter.id) }))
       }
       
-      // Ouvrir le panel pour montrer le filtre actif
       setIsOpen(true)
     }
   }, [externalFilter])
@@ -71,13 +68,13 @@ function FilterPanel({
 
       // Filtre recherche
       if (filters.search) {
-      const searchLower = filters.search.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
-      const nomMatch = myth.nom_mythe?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(searchLower);
-      const descMatch = myth.description_mythe?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(searchLower);
-      if (!nomMatch && !descMatch) {
-        return false;
+        const searchLower = filters.search.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '');
+        const nomMatch = myth.nom_mythe?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(searchLower);
+        const descMatch = myth.description_mythe?.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').includes(searchLower);
+        if (!nomMatch && !descMatch) {
+          return false;
+        }
       }
-    }
 
       return true
     })
@@ -146,21 +143,24 @@ function FilterPanel({
       </button>
 
       {/* Panel */}
-      <div style={{
-        position: 'absolute',
-        left: isOpen ? '0' : '-320px',
-        top: '0',
-        width: '300px',
-        height: '100%',
-        background: 'linear-gradient(to bottom, #2c3e50, #34495e)',
-        boxShadow: '4px 0 15px rgba(0,0,0,0.3)',
-        zIndex: 999,
-        transition: 'left 0.3s ease',
-        overflowY: 'auto',
-        padding: '20px',
-        color: 'white',
-        fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
-      }}>
+      <div 
+        className="filter-panel"
+        style={{
+          position: 'absolute',
+          left: isOpen ? '0' : '-320px',
+          top: '0',
+          width: '300px',
+          height: '100%',
+          background: 'linear-gradient(to bottom, #2c3e50, #34495e)',
+          boxShadow: '4px 0 15px rgba(0,0,0,0.3)',
+          zIndex: 999,
+          transition: 'left 0.3s ease',
+          overflowY: 'auto',
+          padding: '20px',
+          color: 'white',
+          fontFamily: '"Segoe UI", Tahoma, Geneva, Verdana, sans-serif'
+        }}
+      >
         <h3 style={{
           marginTop: '60px',
           marginBottom: '25px',
@@ -253,11 +253,13 @@ function FilterPanel({
             }}
           >
             <option value="all" style={{ background: '#34495e' }}>Toutes les régions</option>
-            {regions.map(r => (
-              <option key={r.id_region} value={r.id_region} style={{ background: '#34495e' }}>
-                {r.nom_region}
-              </option>
-            ))}
+            {regions
+              .sort((a, b) => a.nom_region.localeCompare(b.nom_region, 'fr'))
+              .map(r => (
+                <option key={r.id_region} value={r.id_region} style={{ background: '#34495e' }}>
+                  {r.nom_region}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -290,11 +292,13 @@ function FilterPanel({
             }}
           >
             <option value="all" style={{ background: '#34495e' }}>Toutes les cultures</option>
-            {cultures.map(c => (
-              <option key={c.id_culture} value={c.id_culture} style={{ background: '#34495e' }}>
-                {c.nom_culture}
-              </option>
-            ))}
+            {cultures
+              .sort((a, b) => a.nom_culture.localeCompare(b.nom_culture, 'fr'))
+              .map(c => (
+                <option key={c.id_culture} value={c.id_culture} style={{ background: '#34495e' }}>
+                  {c.nom_culture}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -327,11 +331,13 @@ function FilterPanel({
             }}
           >
             <option value="all" style={{ background: '#34495e' }}>Tous les thèmes</option>
-            {themes.map(t => (
-              <option key={t.id_theme} value={t.id_theme} style={{ background: '#34495e' }}>
-                {t.nom_theme}
-              </option>
-            ))}
+            {themes
+              .sort((a, b) => a.nom_theme.localeCompare(b.nom_theme, 'fr'))
+              .map(t => (
+                <option key={t.id_theme} value={t.id_theme} style={{ background: '#34495e' }}>
+                  {t.nom_theme}
+                </option>
+              ))}
           </select>
         </div>
 
@@ -364,11 +370,17 @@ function FilterPanel({
             }}
           >
             <option value="all" style={{ background: '#34495e' }}>Toutes les créatures</option>
-            {creatures.map(cr => (
-              <option key={cr.id_typologie} value={cr.id_typologie} style={{ background: '#34495e' }}>
-                {cr.nom_creature || cr.nom || cr.type_creature || `ID ${cr.id_typologie}`}
-              </option>
-            ))}
+            {creatures
+              .sort((a, b) => {
+                const nameA = a.nom_creature || a.nom || a.type_creature || ''
+                const nameB = b.nom_creature || b.nom || b.type_creature || ''
+                return nameA.localeCompare(nameB, 'fr')
+              })
+              .map(cr => (
+                <option key={cr.id_typologie} value={cr.id_typologie} style={{ background: '#34495e' }}>
+                  {cr.nom_creature || cr.nom || cr.type_creature || `ID ${cr.id_typologie}`}
+                </option>
+              ))}
           </select>
         </div>
 

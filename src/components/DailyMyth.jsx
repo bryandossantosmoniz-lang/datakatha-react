@@ -152,7 +152,7 @@ function DailyMyth({ myth}) {
             alt={todayMyth.nom_mythe} 
             style={{ 
               width: '100%', 
-              height: '500px',
+              height: '600px',
               objectFit: 'cover',
               borderRadius: '10px'
             }} 

@@ -63,7 +63,7 @@ function Header() {
               filter: 'drop-shadow(2px 2px 4px rgba(0,0,0,0.2))'
             }}
           />
-          {!isMobile && <span>DATAKATHA</span>}
+          <span style={{ fontSize: isMobile ? '16px' : undefined }}>DATAKATHA</span>
         </Link>
 
         {/* Hamburger Button (Mobile only) */}
@@ -297,6 +297,32 @@ function Header() {
           >
             ℹ️ À Propos
           </Link>
+
+          {/* Bouton Tutoriel : dans la nav pour ne pas chevaucher le logo */}
+          <button
+            onClick={() => {
+              closeMenu()
+              localStorage.removeItem('tutorialCompleted')
+              window.location.reload()
+            }}
+            style={{
+              padding: isMobile ? '15px 20px' : '10px 20px',
+              marginLeft: isMobile ? 0 : '8px',
+              background: '#F6AA1C',
+              color: 'white',
+              border: 'none',
+              borderRadius: '8px',
+              cursor: 'pointer',
+              fontSize: '14px',
+              fontWeight: '600',
+              width: isMobile ? '100%' : 'auto',
+              textAlign: isMobile ? 'left' : 'center',
+              borderBottom: isMobile ? '1px solid rgba(255,255,255,0.1)' : 'none',
+              transition: 'all 0.2s'
+            }}
+          >
+            📖 Tutoriel
+          </button>
         </nav>
       </div>
 

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useRef, useCallback } from 'react'
 
-function TimeSlider({ mythes, onTimeFilterChange }) {
+function TimeSlider({ mythes, onTimeFilterChange, className = '' }) {
   const [minYear, setMinYear] = useState(-1500)
   const [maxYear, setMaxYear] = useState(2025)
   const [minVal, setMinVal] = useState(-1500)
@@ -137,6 +137,7 @@ function TimeSlider({ mythes, onTimeFilterChange }) {
         {isMobile ? (
           // MOBILE : Petit bouton flottant
           <button
+            className={className}
             onClick={() => setIsExpanded(true)}
             style={{
               position: 'fixed',
@@ -179,7 +180,9 @@ function TimeSlider({ mythes, onTimeFilterChange }) {
           </button>
         ) : (
           // DESKTOP : Barre compacte en bas
-          <div style={{
+          <div
+            className={className}
+            style={{
             position: 'absolute',
             bottom: '20px',
             left: '50%',
@@ -278,7 +281,9 @@ function TimeSlider({ mythes, onTimeFilterChange }) {
 
   // MODE ÉTENDU (Mobile ouvert ou Desktop)
   return (
-    <div style={{
+    <div
+      className={className}
+      style={{
       position: isMobile ? 'fixed' : 'absolute',
       bottom: isMobile ? '0' : '20px',
       left: isMobile ? '0' : '50%',

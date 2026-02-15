@@ -124,7 +124,7 @@ function ComparisonPage() {
         </div>
 
         {/* Sélecteurs */}
-        <div style={{
+        <div className="myth-selector" style={{
           display: 'grid',
           gridTemplateColumns: 'repeat(auto-fit, minmax(280px, 1fr))',
           gap: '20px',

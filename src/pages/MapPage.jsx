@@ -346,7 +346,7 @@ function CultureLegend({ cultures, validMythes }) {
   const [isOpen, setIsOpen] = useState(false)
   
   return (
-    <div style={{
+    <div className="layer-control" style={{
       position: 'absolute',
       top: '20px',
       right: '20px',
@@ -802,10 +802,12 @@ if (storedMyth && !loading && allMythes.length > 0) {
         creatures={creatures}
         regions={regions}
         externalFilter={externalFilter}
+        className="filter-panel"
       />
 
       <div style={{ flex: 1, position: 'relative' }}>
         <LayerControl 
+          className="layer-control"
           onLayerChange={(layers) => setActiveLayers(layers)}
           isMobile={isMobile}
         />
@@ -1124,6 +1126,7 @@ if (storedMyth && !loading && allMythes.length > 0) {
               return (
                 <Polygon
                   key={key}
+                  className="culture-polygon"
                   positions={validCoords}
                   color={colors.color}
                   fillColor={colors.fillColor}
@@ -1359,6 +1362,7 @@ if (storedMyth && !loading && allMythes.length > 0) {
 
         <TimeSlider 
           mythes={filteredMythes}
+          className="time-slider"
           onTimeFilterChange={handleTimeFilterChange}
         />
 

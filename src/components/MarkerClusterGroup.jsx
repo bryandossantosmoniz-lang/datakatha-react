@@ -107,26 +107,43 @@ function MarkerClusterGroup({ children }) {
   return null
 }
 
+// Échappe le HTML pour éviter les XSS (données venant de la BDD)
+function escapeHtml(str) {
+  if (str == null || typeof str !== 'string') return ''
+  const el = document.createElement('div')
+  el.textContent = str
+  return el.innerHTML
+}
+
+function stringifyChild(child) {
+  if (child == null) return ''
+  if (typeof child === 'string') return escapeHtml(child)
+  if (Array.isArray(child)) return child.map(stringifyChild).join('')
+  if (child.props && child.props.children != null) return stringifyChild(child.props.children)
+  return ''
+}
+
 // Fonction helper pour rendre le contenu du popup
 function renderPopupContent(content) {
   if (typeof content === 'string') {
-    return content
+    return escapeHtml(content)
   }
   
   if (Array.isArray(content)) {
     return content.map(item => {
       if (typeof item === 'string') {
-        return item
+        return escapeHtml(item)
       }
       if (item && item.props) {
+        const safe = stringifyChild(item.props.children)
         if (item.type === 'strong') {
-          return `<strong style="color: #F6AA1C">${item.props.children}</strong>`
+          return `<strong style="color: #F6AA1C">${safe}</strong>`
         }
         if (item.type === 'p') {
-          return `<p style="margin: 5px 0; font-size: 0.9em">${item.props.children}</p>`
+          return `<p style="margin: 5px 0; font-size: 0.9em">${safe}</p>`
         }
         if (item.type === 'button') {
-          return `<button style="margin-top: 8px; padding: 5px 12px; background: #F6AA1C; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px">${item.props.children}</button>`
+          return `<button style="margin-top: 8px; padding: 5px 12px; background: #F6AA1C; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 12px">${safe}</button>`
         }
       }
       return ''

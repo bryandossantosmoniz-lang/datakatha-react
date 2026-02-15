@@ -14,6 +14,11 @@ function BibliothequeCard({ title, items, icon, color, onItemClick }) {
     'Régions': "Espace géographique ou culturel auquel un mythe est associé, utilisé pour situer son origine."
   }
 
+  // TRI ALPHABÉTIQUE DES ITEMS
+  const sortedItems = [...items].sort((a, b) => 
+    a.name.localeCompare(b.name, 'fr')
+  )
+
   return (
     <div style={{
       background: 'white',
@@ -114,12 +119,12 @@ function BibliothequeCard({ title, items, icon, color, onItemClick }) {
           overflowY: 'auto',
           padding: '10px'
         }}>
-          <div style={{
+          <div className="filter-section" style={{
             display: 'grid',
             gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))',
             gap: '15px'
           }}>
-            {items.map((item, i) => (
+            {sortedItems.map((item, i) => (
               <div
                 key={i}
                 onClick={() => onItemClick && onItemClick(item)}
@@ -316,7 +321,6 @@ function Bibliotheque() {
         type: 'famille'
       })) || [])
 
-      // RÉGIONS avec comptage corrigé
       setRegions(regionsData?.map(r => ({
         name: r.nom_region,
         description: r.resume_region,
@@ -343,7 +347,7 @@ function Bibliotheque() {
 
   if (loading) {
     return (
-      <div style={{
+      <div className="loading-section" style={{
         display: 'flex',
         justifyContent: 'center',
         alignItems: 'center',
@@ -457,7 +461,7 @@ function Bibliotheque() {
           </div>
         </div>
 
-        <div style={{ display: 'grid', gap: '20px' }}>
+        <div className="myth-card" style={{ display: 'grid', gap: '20px' }}>
           <BibliothequeCard
             title="Cultures"
             items={cultures}

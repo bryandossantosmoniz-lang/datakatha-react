@@ -17,11 +17,11 @@ function GalleryCard({ myth, onCardClick }) {
     setLoadingImage(false)
   }
 
-  {/*Si le mythe a des images associées, on prend la première. Sinon, on utilise l'image de la créature si elle existe.*/}
   const mainImage = images.length > 0 ? images[0].url : myth.creature?.image_creature_url
 
   return (
     <div
+      className="gallery-card"
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
       onClick={() => onCardClick(myth)}
@@ -41,7 +41,7 @@ function GalleryCard({ myth, onCardClick }) {
       }}
     >
       <div style={{
-        height: '220px',
+        height: '280px',
         overflow: 'hidden',
         background: mainImage 
           ? `url(${mainImage}) center/cover` 
@@ -187,9 +187,11 @@ function GalleryPage() {
   const [loading, setLoading] = useState(true)
   const [searchTerm, setSearchTerm] = useState('')
   const [selectedCulture, setSelectedCulture] = useState('all')
+  const [selectedRegion, setSelectedRegion] = useState('all')
   const [selectedTheme, setSelectedTheme] = useState('all')
   const [viewMode, setViewMode] = useState('grid')
   const [cultures, setCultures] = useState([])
+  const [regions, setRegions] = useState([])
   const [themes, setThemes] = useState([])
 
   useEffect(() => {
@@ -198,22 +200,40 @@ function GalleryPage() {
 
   useEffect(() => {
     filterMythes()
-  }, [searchTerm, selectedCulture, selectedTheme, mythes])
+  }, [searchTerm, selectedCulture, selectedRegion, selectedTheme, mythes])
 
   const loadMythes = async () => {
     const data = await getMythes()
     setMythes(data)
     setFilteredMythes(data)
 
+    // Cultures uniques
     const culturesUniques = [...new Map(
       data.map(m => m.culture).filter(Boolean).map(c => [c.id_culture, c])
     ).values()]
 
+    // Thèmes uniques
     const themesUniques = [...new Map(
       data.map(m => m.theme).filter(Boolean).map(t => [t.id_theme, t])
     ).values()]
 
+    // Régions uniques
+    const regionsUniques = []
+    const regionMap = new Map()
+    
+    data.forEach(myth => {
+      if (myth.regions && Array.isArray(myth.regions)) {
+        myth.regions.forEach(r => {
+          if (r && r.id_region && !regionMap.has(r.id_region)) {
+            regionMap.set(r.id_region, r)
+            regionsUniques.push(r)
+          }
+        })
+      }
+    })
+
     setCultures(culturesUniques)
+    setRegions(regionsUniques)
     setThemes(themesUniques)
     setLoading(false)
   }
@@ -230,6 +250,12 @@ function GalleryPage() {
 
     if (selectedCulture !== 'all') {
       filtered = filtered.filter(m => m.id_culture === parseInt(selectedCulture))
+    }
+
+    if (selectedRegion !== 'all') {
+      filtered = filtered.filter(m => 
+        m.regions?.some(r => r.id_region === parseInt(selectedRegion))
+      )
     }
 
     if (selectedTheme !== 'all') {
@@ -303,7 +329,7 @@ function GalleryPage() {
         }}>
           <div style={{
             display: 'grid',
-            gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))',
+            gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
             gap: '15px',
             marginBottom: '15px'
           }}>
@@ -337,11 +363,35 @@ function GalleryPage() {
               }}
             >
               <option value="all">Toutes les cultures</option>
-              {cultures.map(c => (
-                <option key={c.id_culture} value={c.id_culture}>
-                  {c.nom_culture}
-                </option>
-              ))}
+              {cultures
+                .sort((a, b) => a.nom_culture.localeCompare(b.nom_culture, 'fr'))
+                .map(c => (
+                  <option key={c.id_culture} value={c.id_culture}>
+                    {c.nom_culture}
+                  </option>
+                ))}
+            </select>
+
+            <select
+              value={selectedRegion}
+              onChange={(e) => setSelectedRegion(e.target.value)}
+              style={{
+                padding: '12px 16px',
+                borderRadius: '10px',
+                border: '2px solid #e0e0e0',
+                fontSize: '14px',
+                cursor: 'pointer',
+                background: 'white'
+              }}
+            >
+              <option value="all">Toutes les régions</option>
+              {regions
+                .sort((a, b) => a.nom_region.localeCompare(b.nom_region, 'fr'))
+                .map(r => (
+                  <option key={r.id_region} value={r.id_region}>
+                    {r.nom_region}
+                  </option>
+                ))}
             </select>
 
             <select
@@ -357,11 +407,13 @@ function GalleryPage() {
               }}
             >
               <option value="all">Tous les thèmes</option>
-              {themes.map(t => (
-                <option key={t.id_theme} value={t.id_theme}>
-                  {t.nom_theme}
-                </option>
-              ))}
+              {themes
+                .sort((a, b) => a.nom_theme.localeCompare(b.nom_theme, 'fr'))
+                .map(t => (
+                  <option key={t.id_theme} value={t.id_theme}>
+                    {t.nom_theme}
+                  </option>
+                ))}
             </select>
           </div>
 
