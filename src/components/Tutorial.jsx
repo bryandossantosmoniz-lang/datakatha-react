@@ -95,6 +95,13 @@ function Tutorial({ onClose, onComplete }) {
   const location = useLocation()
   const [currentStep, setCurrentStep] = useState(0)
   const [targetRect, setTargetRect] = useState(null)
+  const [isMobile, setIsMobile] = useState(typeof window !== 'undefined' && window.innerWidth < 768)
+
+  useEffect(() => {
+    const onResize = () => setIsMobile(window.innerWidth < 768)
+    window.addEventListener('resize', onResize)
+    return () => window.removeEventListener('resize', onResize)
+  }, [])
 
   const step = TUTORIAL_STEPS[currentStep]
 
@@ -194,9 +201,8 @@ function Tutorial({ onClose, onComplete }) {
     )
   }
 
-  // Tooltip avec positions FIXES SIMPLES
+  // Tooltip avec positions FIXES SIMPLES (sur mobile : toujours centré en bas pour rester visible et cliquable)
   const renderTooltip = () => {
-    // Positions fixes simples selon step.position
     let tooltipStyle = {
       position: 'fixed',
       zIndex: 10000,
@@ -205,35 +211,46 @@ function Tutorial({ onClose, onComplete }) {
       color: 'white',
       padding: '28px',
       borderRadius: '16px',
-      boxShadow: '0 20px 60px rgba(0,0,0,0.4)'
+      boxShadow: '0 20px 60px rgba(0,0,0,0.4)',
+      pointerEvents: 'auto'
     }
 
-    switch (step.position) {
-      case 'center':
-        tooltipStyle.top = '50%'
-        tooltipStyle.left = '50%'
-        tooltipStyle.transform = 'translate(-50%, -50%)'
-        break
-      case 'top':
-        tooltipStyle.top = '15%'
-        tooltipStyle.left = '50%'
-        tooltipStyle.transform = 'translateX(-50%)'
-        break
-      case 'bottom':
-        tooltipStyle.bottom = '15%'
-        tooltipStyle.left = '50%'
-        tooltipStyle.transform = 'translateX(-50%)'
-        break
-      case 'left':
-        tooltipStyle.top = '50%'
-        tooltipStyle.left = '420px'
-        tooltipStyle.transform = 'translateY(-50%)'
-        break
-      case 'right':
-        tooltipStyle.top = '50%'
-        tooltipStyle.right = '20px'
-        tooltipStyle.transform = 'translateY(-50%)'
-        break
+    if (isMobile) {
+      tooltipStyle.left = '50%'
+      tooltipStyle.right = 'auto'
+      tooltipStyle.bottom = '20px'
+      tooltipStyle.top = 'auto'
+      tooltipStyle.transform = 'translateX(-50%)'
+      tooltipStyle.maxWidth = 'calc(100vw - 32px)'
+      tooltipStyle.padding = '20px'
+    } else {
+      switch (step.position) {
+        case 'center':
+          tooltipStyle.top = '50%'
+          tooltipStyle.left = '50%'
+          tooltipStyle.transform = 'translate(-50%, -50%)'
+          break
+        case 'top':
+          tooltipStyle.top = '15%'
+          tooltipStyle.left = '50%'
+          tooltipStyle.transform = 'translateX(-50%)'
+          break
+        case 'bottom':
+          tooltipStyle.bottom = '15%'
+          tooltipStyle.left = '50%'
+          tooltipStyle.transform = 'translateX(-50%)'
+          break
+        case 'left':
+          tooltipStyle.top = '50%'
+          tooltipStyle.left = '420px'
+          tooltipStyle.transform = 'translateY(-50%)'
+          break
+        case 'right':
+          tooltipStyle.top = '50%'
+          tooltipStyle.right = '20px'
+          tooltipStyle.transform = 'translateY(-50%)'
+          break
+      }
     }
 
     return (
