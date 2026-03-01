@@ -7,7 +7,7 @@ function TeamSection() {
       role: 'Data-Engineer & Full stack-Developpeur',
       image: '/Bryan.jpg',
       description: 'Passionné par la création, la structuration de données, la conception de data-pipelines et le développement de sites web en React',
-      skills: ['VS code', 'Database', 'REACT'],
+      skills: ['REACT', 'Data-pipeline', 'Cursor'],
       color: '#667eea', 
       linkedin: 'https://www.linkedin.com/in/bryan-dos-santos-moniz/'
     },
@@ -22,19 +22,19 @@ function TeamSection() {
     },
     {
       name: 'Sewedo',
-      role: 'Designer & Chercheur',
+      role: 'Gestionnaire base de données & automatisation',
       image: '/Sewedo.jpg',
-      description: 'Spécialiste en design d\'interfaces et recherche ethnographique. Création du système visuel et documentation des mythes.',
-      skills: ['UI/UX', 'Recherche', 'Design'],
+      description: 'Spécialiste en Webscrapping et automatisation. J\'ai contribué à l\'enrichissement de la base de données par automatisation via Python.',
+      skills: ['Webscrapping', 'Automatisation', 'Gestion BDD'],
       color: '#F6AA1C',
       linkedin: 'https://www.linkedin.com/in/sewedo-g-aa8578195/'
     },
     {
       name: 'Rafael',
-      role: 'Développeur Frontend',
+      role: 'Gestionnaire base de données & chercheur',
       image: '/Rafael.jpg',
-      description: 'Expert en visualisation de données et animations. Développement des composants interactifs et de la timeline.',
-      skills: ['JavaScript', 'D3.js', 'Animation'],
+      description: 'Référent architecture base de données. Chercheur attiré par les mythes d\'Europe, d\'Asie et d\'Océanie. Passionné de culture populaire et rédacteur des diffusions.',
+      skills: ['Gestion BDD', 'Recherche', 'Cartographie'],
       color: '#27ae60', 
       linkedin: 'https://www.linkedin.com/in/rafael-topa-800b35388/'
     }

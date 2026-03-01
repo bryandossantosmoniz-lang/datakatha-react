@@ -479,7 +479,7 @@ function Bibliotheque() {
           />
           
           <BibliothequeCard
-            title="Créatures"
+            title="Sous-familles de Créatures"
             items={creatures}
             icon="🐉"
             color="#e74c3c"
